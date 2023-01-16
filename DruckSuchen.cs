@@ -54,7 +54,7 @@ namespace Querdruck
             {
                 MessageBox.Show(ex.Message);
             }
-
+            DruckSuchenOK.Select();
         }
 
         private void DruckSuchenOK_Click(object sender, EventArgs e)

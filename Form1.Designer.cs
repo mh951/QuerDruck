@@ -280,6 +280,7 @@ namespace Querdruck
             this.toolStripMenuItem15.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this.toolStripMenuItem15.Size = new System.Drawing.Size(230, 22);
             this.toolStripMenuItem15.Text = "Druck speichern";
+            this.toolStripMenuItem15.Click += new System.EventHandler(this.toolStripMenuItem15_Click);
             // 
             // toolStripMenuItem16
             // 
@@ -311,21 +312,21 @@ namespace Querdruck
             // 
             this.toolStripMenuItem18.Name = "toolStripMenuItem18";
             this.toolStripMenuItem18.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F1)));
-            this.toolStripMenuItem18.Size = new System.Drawing.Size(166, 22);
+            this.toolStripMenuItem18.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem18.Text = "Sperren";
             this.toolStripMenuItem18.Click += new System.EventHandler(this.toolStripMenuItem18_Click);
             // 
             // toolStripMenuItem19
             // 
             this.toolStripMenuItem19.Name = "toolStripMenuItem19";
-            this.toolStripMenuItem19.Size = new System.Drawing.Size(166, 22);
+            this.toolStripMenuItem19.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem19.Text = "Band";
             this.toolStripMenuItem19.Click += new System.EventHandler(this.toolStripMenuItem19_Click);
             // 
             // toolStripMenuItem20
             // 
             this.toolStripMenuItem20.Name = "toolStripMenuItem20";
-            this.toolStripMenuItem20.Size = new System.Drawing.Size(166, 22);
+            this.toolStripMenuItem20.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem20.Text = "Druckfarbe";
             this.toolStripMenuItem20.Click += new System.EventHandler(this.toolStripMenuItem20_Click);
             // 
@@ -333,7 +334,7 @@ namespace Querdruck
             // 
             this.toolStripMenuItem21.Name = "toolStripMenuItem21";
             this.toolStripMenuItem21.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-            this.toolStripMenuItem21.Size = new System.Drawing.Size(166, 22);
+            this.toolStripMenuItem21.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem21.Text = "Ausdruck";
             // 
             // toolStripMenuItem4
@@ -355,6 +356,7 @@ namespace Querdruck
             this.toolStripMenuItem22.ShortcutKeys = System.Windows.Forms.Keys.F1;
             this.toolStripMenuItem22.Size = new System.Drawing.Size(209, 22);
             this.toolStripMenuItem22.Text = "Drucken";
+            this.toolStripMenuItem22.Click += new System.EventHandler(this.toolStripMenuItem22_Click);
             // 
             // toolStripMenuItem23
             // 
@@ -369,6 +371,7 @@ namespace Querdruck
             this.toolStripMenuItem24.ShortcutKeys = System.Windows.Forms.Keys.F3;
             this.toolStripMenuItem24.Size = new System.Drawing.Size(209, 22);
             this.toolStripMenuItem24.Text = "Text/Druckfenster";
+            this.toolStripMenuItem24.Click += new System.EventHandler(this.toolStripMenuItem24_Click);
             // 
             // toolStripMenuItem25
             // 
@@ -376,6 +379,7 @@ namespace Querdruck
             this.toolStripMenuItem25.ShortcutKeys = System.Windows.Forms.Keys.F4;
             this.toolStripMenuItem25.Size = new System.Drawing.Size(209, 22);
             this.toolStripMenuItem25.Text = "Referenzfahrt";
+            this.toolStripMenuItem25.Click += new System.EventHandler(this.toolStripMenuItem25_Click);
             // 
             // toolStripMenuItem26
             // 
@@ -696,6 +700,7 @@ namespace Querdruck
             this.Zeile15.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Zeile15_MouseClick);
             this.Zeile15.TextChanged += new System.EventHandler(this.Zeile15_TextChanged);
             this.Zeile15.DoubleClick += new System.EventHandler(this.Zeile15_DoubleClick);
+            this.Zeile15.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Zeile15_KeyDown);
             // 
             // Sperren1
             // 
@@ -705,6 +710,7 @@ namespace Querdruck
             this.Sperren1.Size = new System.Drawing.Size(19, 27);
             this.Sperren1.TabIndex = 25;
             this.Sperren1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Sperren1.TextChanged += new System.EventHandler(this.Sperren1_TextChanged);
             this.Sperren1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Sperren1_KeyPress);
             // 
             // Sperren2
@@ -715,6 +721,7 @@ namespace Querdruck
             this.Sperren2.Size = new System.Drawing.Size(19, 27);
             this.Sperren2.TabIndex = 26;
             this.Sperren2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Sperren2.TextChanged += new System.EventHandler(this.Sperren2_TextChanged);
             this.Sperren2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Sperren2_KeyPress);
             // 
             // Sperren3
@@ -725,6 +732,7 @@ namespace Querdruck
             this.Sperren3.Size = new System.Drawing.Size(19, 27);
             this.Sperren3.TabIndex = 27;
             this.Sperren3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Sperren3.TextChanged += new System.EventHandler(this.Sperren3_TextChanged);
             this.Sperren3.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Sperren3_KeyPress);
             // 
             // Sperren4
@@ -735,6 +743,7 @@ namespace Querdruck
             this.Sperren4.Size = new System.Drawing.Size(19, 27);
             this.Sperren4.TabIndex = 28;
             this.Sperren4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Sperren4.TextChanged += new System.EventHandler(this.Sperren4_TextChanged);
             this.Sperren4.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Sperren4_KeyPress);
             // 
             // Sperren5
@@ -745,6 +754,7 @@ namespace Querdruck
             this.Sperren5.Size = new System.Drawing.Size(19, 27);
             this.Sperren5.TabIndex = 29;
             this.Sperren5.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Sperren5.TextChanged += new System.EventHandler(this.Sperren5_TextChanged);
             this.Sperren5.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Sperren5_KeyPress);
             // 
             // Sperren6
@@ -755,6 +765,7 @@ namespace Querdruck
             this.Sperren6.Size = new System.Drawing.Size(19, 27);
             this.Sperren6.TabIndex = 30;
             this.Sperren6.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Sperren6.TextChanged += new System.EventHandler(this.Sperren6_TextChanged);
             this.Sperren6.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Sperren6_KeyPress);
             // 
             // Sperren7
@@ -765,6 +776,7 @@ namespace Querdruck
             this.Sperren7.Size = new System.Drawing.Size(19, 27);
             this.Sperren7.TabIndex = 31;
             this.Sperren7.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Sperren7.TextChanged += new System.EventHandler(this.Sperren7_TextChanged);
             this.Sperren7.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Sperren7_KeyPress);
             // 
             // Sperren8
@@ -775,6 +787,7 @@ namespace Querdruck
             this.Sperren8.Size = new System.Drawing.Size(19, 27);
             this.Sperren8.TabIndex = 32;
             this.Sperren8.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Sperren8.TextChanged += new System.EventHandler(this.Sperren8_TextChanged);
             this.Sperren8.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Sperren8_KeyPress);
             // 
             // Sperren9
@@ -785,6 +798,7 @@ namespace Querdruck
             this.Sperren9.Size = new System.Drawing.Size(19, 27);
             this.Sperren9.TabIndex = 33;
             this.Sperren9.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Sperren9.TextChanged += new System.EventHandler(this.Sperren9_TextChanged);
             this.Sperren9.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Sperren9_KeyPress);
             // 
             // Sperren10
@@ -795,6 +809,7 @@ namespace Querdruck
             this.Sperren10.Size = new System.Drawing.Size(19, 27);
             this.Sperren10.TabIndex = 34;
             this.Sperren10.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Sperren10.TextChanged += new System.EventHandler(this.Sperren10_TextChanged);
             this.Sperren10.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Sperren10_KeyPress);
             // 
             // Sperren11
@@ -805,6 +820,7 @@ namespace Querdruck
             this.Sperren11.Size = new System.Drawing.Size(19, 27);
             this.Sperren11.TabIndex = 35;
             this.Sperren11.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Sperren11.TextChanged += new System.EventHandler(this.Sperren11_TextChanged);
             this.Sperren11.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Sperren11_KeyPress);
             // 
             // Sperren12
@@ -815,6 +831,7 @@ namespace Querdruck
             this.Sperren12.Size = new System.Drawing.Size(19, 27);
             this.Sperren12.TabIndex = 36;
             this.Sperren12.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Sperren12.TextChanged += new System.EventHandler(this.Sperren12_TextChanged);
             this.Sperren12.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Sperren12_KeyPress);
             // 
             // Sperren13
@@ -825,6 +842,7 @@ namespace Querdruck
             this.Sperren13.Size = new System.Drawing.Size(19, 27);
             this.Sperren13.TabIndex = 37;
             this.Sperren13.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Sperren13.TextChanged += new System.EventHandler(this.Sperren13_TextChanged);
             this.Sperren13.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Sperren13_KeyPress);
             // 
             // Sperren14
@@ -835,6 +853,7 @@ namespace Querdruck
             this.Sperren14.Size = new System.Drawing.Size(19, 27);
             this.Sperren14.TabIndex = 38;
             this.Sperren14.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Sperren14.TextChanged += new System.EventHandler(this.Sperren14_TextChanged);
             this.Sperren14.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Sperren14_KeyPress);
             // 
             // Sperren15
@@ -845,6 +864,7 @@ namespace Querdruck
             this.Sperren15.Size = new System.Drawing.Size(19, 27);
             this.Sperren15.TabIndex = 39;
             this.Sperren15.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.Sperren15.TextChanged += new System.EventHandler(this.Sperren15_TextChanged);
             this.Sperren15.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Sperren15_KeyPress);
             // 
             // label5
@@ -1461,10 +1481,10 @@ namespace Querdruck
             this.WeißButton.AutoSize = true;
             this.WeißButton.Location = new System.Drawing.Point(0, 71);
             this.WeißButton.Name = "WeißButton";
-            this.WeißButton.Size = new System.Drawing.Size(49, 17);
+            this.WeißButton.Size = new System.Drawing.Size(53, 17);
             this.WeißButton.TabIndex = 3;
             this.WeißButton.TabStop = true;
-            this.WeißButton.Text = "weiß";
+            this.WeißButton.Text = "silber";
             this.WeißButton.UseVisualStyleBackColor = true;
             // 
             // SchwarzButton
@@ -1527,7 +1547,7 @@ namespace Querdruck
             this.Druckzeit.Size = new System.Drawing.Size(57, 22);
             this.Druckzeit.TabIndex = 102;
             this.Druckzeit.Value = new decimal(new int[] {
-            40,
+            50,
             0,
             0,
             0});
@@ -1550,7 +1570,7 @@ namespace Querdruck
             this.DruckStaerke.Size = new System.Drawing.Size(57, 22);
             this.DruckStaerke.TabIndex = 103;
             this.DruckStaerke.Value = new decimal(new int[] {
-            40,
+            50,
             0,
             0,
             0});
@@ -1605,6 +1625,7 @@ namespace Querdruck
             this.AutoSuchen.TabIndex = 108;
             this.AutoSuchen.Text = "Autom. suchen";
             this.AutoSuchen.UseVisualStyleBackColor = true;
+            this.AutoSuchen.Click += new System.EventHandler(this.AutoSuchen_Click);
             // 
             // FensterWechseln
             // 
@@ -1626,6 +1647,7 @@ namespace Querdruck
             this.ReferenzFahrt.TabIndex = 110;
             this.ReferenzFahrt.Text = "Referenzfahrt";
             this.ReferenzFahrt.UseVisualStyleBackColor = true;
+            this.ReferenzFahrt.Click += new System.EventHandler(this.ReferenzFahrt_Click);
             // 
             // SchriftWechseln
             // 
@@ -1670,6 +1692,7 @@ namespace Querdruck
             this.PumpeAus.TabIndex = 114;
             this.PumpeAus.Text = "Pumpe\r\naus\r\n";
             this.PumpeAus.UseVisualStyleBackColor = true;
+            this.PumpeAus.Click += new System.EventHandler(this.PumpeAus_Click);
             // 
             // Folienvorschub
             // 
@@ -1712,11 +1735,6 @@ namespace Querdruck
             "Als Abschiedsgruß",
             "Als letzten Gruß",
             "Als letzter Gruß",
-            "Aus Dankbarkeit",
-            "Deine Arbeitskameraden",
-            "Deine Arbeitskollegen",
-            "Deine Enkelkinder",
-            "Deine Kinder und Enkel",
             "Die letzten Grüße",
             "Du bleibst uns unvergessen",
             "Ein letzter Gruß",
@@ -1748,18 +1766,8 @@ namespace Querdruck
             "Letzte Grüße",
             "Letzte liebe Grüße",
             "Letzter Gruß",
-            "Meinem lieben Mann",
-            "Meinem lieben Opa",
-            "Meinem lieben Vater",
-            "Meiner lieben Frau",
-            "Meiner lieben Mutter",
-            "Meiner lieben Oma",
             "Mit stillem Gruß",
             "Ruhe in Frieden",
-            "Unserem lieben Opa",
-            "Unserem lieben Vater",
-            "Unserer lieben Mutter",
-            "Unserer lieben Oma",
             "Unvergeßlich bleibst Du",
             "Wir werden Dich nie vergessen",
             "Wir werden immer an Dich denken",

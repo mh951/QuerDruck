@@ -9,27 +9,79 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MySql.Data;
 using MySql.Data.MySqlClient;
+using System.IO.Ports;
+using System.Threading;
+
+
 
 namespace Querdruck
 {
     public partial class Form1 : Form
     {
         public static bool Bearbeiten_Mode = true;
-        public static bool Druck_Mode = false;
-        public static int letzte_Zeile = 1;
-        public int Schriftgröße = -1;
+        public static int letzte_Zeile = 0;
+        public int Schriftgröße = -1, Tisch_init = 0;
         public int Seite2 = 0;
         public static string z1, z2, z3, z4, z5, z6, z7, z8, z9, z10, z11, z12, z13, z14, z15,
                              h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h15,
                              s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15,
                              stzNr, BdNr, brte, AVA, srft, frb, gedd, Dtm;
         Dictionary<TextBox, string> GoNull = new Dictionary<TextBox, string> { };
+        Dictionary<TextBox, TextBox> Zeilen_Höhe = new Dictionary<TextBox, TextBox> { };
         public string AktuellDruck;
         public string AktuellDatei = "Druckdatei";
+        public static bool Referencefahrt_done = false;
+        List<char> SonderZeichen = new List<char> { 'Ä', 'Ü', 'Ö', ':', ';', 'é', 'è', 'á', 'à' };
+        List<char> Abstände = new List<char> { ' ', '²', '³', '|', '@', 'µ' };
+        List<TextBox> Zeilen = new List<TextBox> { };
+        private SerialPort myport;
+        private SerialPort myport2;
 
         public Form1()
         {
             InitializeComponent();
+            Paaren();
+            Zeilen_füllen();
+        }
+
+        // Jede Zeile mit entsprechender Höhe verknüpfen
+        private void Paaren()
+        {
+            Zeilen_Höhe.Add(Zeile1, Hoehe1);
+            Zeilen_Höhe.Add(Zeile2, Hoehe2);
+            Zeilen_Höhe.Add(Zeile3, Hoehe3);
+            Zeilen_Höhe.Add(Zeile4, Hoehe4);
+            Zeilen_Höhe.Add(Zeile5, Hoehe5);
+            Zeilen_Höhe.Add(Zeile6, Hoehe6);
+            Zeilen_Höhe.Add(Zeile7, Hoehe7);
+            Zeilen_Höhe.Add(Zeile8, Hoehe8);
+            Zeilen_Höhe.Add(Zeile9, Hoehe9);
+            Zeilen_Höhe.Add(Zeile10, Hoehe10);
+            Zeilen_Höhe.Add(Zeile11, Hoehe11);
+            Zeilen_Höhe.Add(Zeile12, Hoehe12);
+            Zeilen_Höhe.Add(Zeile13, Hoehe13);
+            Zeilen_Höhe.Add(Zeile14, Hoehe14);
+            Zeilen_Höhe.Add(Zeile15, Hoehe15);
+        }
+
+        // Die Zeilen in einer Liste legen
+        private void Zeilen_füllen()
+        {
+            Zeilen.Add(Zeile1);
+            Zeilen.Add(Zeile2);
+            Zeilen.Add(Zeile3);
+            Zeilen.Add(Zeile4);
+            Zeilen.Add(Zeile5);
+            Zeilen.Add(Zeile6);
+            Zeilen.Add(Zeile7);
+            Zeilen.Add(Zeile8);
+            Zeilen.Add(Zeile9);
+            Zeilen.Add(Zeile10);
+            Zeilen.Add(Zeile11);
+            Zeilen.Add(Zeile12);
+            Zeilen.Add(Zeile13);
+            Zeilen.Add(Zeile14);
+            Zeilen.Add(Zeile15);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -44,6 +96,56 @@ namespace Querdruck
             {
                 Zeile2.Focus();
                 e.Handled = e.SuppressKeyPress = true;
+                return;
+            }
+            if (e.KeyCode == Keys.D2 && e.Control == true)
+            {
+                string newchar = "²";
+                int selectedIndex = Zeile1.SelectionStart;
+                Zeile1.Text = Zeile1.Text.Insert(selectedIndex, newchar);
+                Zeile1.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D3 && e.Control == true)
+            {
+                string newchar = "³";
+                int selectedIndex = Zeile1.SelectionStart;
+                Zeile1.Text = Zeile1.Text.Insert(selectedIndex, newchar);
+                Zeile1.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D4 && e.Control == true)
+            {
+                string newchar = "@";
+                int selectedIndex = Zeile1.SelectionStart;
+                Zeile1.Text = Zeile1.Text.Insert(selectedIndex, newchar);
+                Zeile1.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D5 && e.Control == true)
+            {
+                string newchar = "µ";
+                int selectedIndex = Zeile1.SelectionStart;
+                Zeile1.Text = Zeile1.Text.Insert(selectedIndex, newchar);
+                Zeile1.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.Oemcomma && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile1.SelectionStart;
+                Zeile1.Text = Zeile1.Text.Insert(selectedIndex, newchar);
+                Zeile1.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.OemPeriod && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile1.SelectionStart;
+                Zeile1.Text = Zeile1.Text.Insert(selectedIndex, newchar);
+                Zeile1.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.F12)
+            {
+                string newchar = "@-@";
+                int selectedIndex = Zeile1.SelectionStart;
+                Zeile1.Text = Zeile1.Text.Insert(selectedIndex, newchar);
+                Zeile1.SelectionStart = selectedIndex + 3;
             }
         }
 
@@ -53,6 +155,56 @@ namespace Querdruck
             {
                 Zeile3.Focus();
                 e.Handled = e.SuppressKeyPress = true;
+                return;
+            }
+            if (e.KeyCode == Keys.D2 && e.Control == true)
+            {
+                string newchar = "²";
+                int selectedIndex = Zeile2.SelectionStart;
+                Zeile2.Text = Zeile2.Text.Insert(selectedIndex, newchar);
+                Zeile2.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D3 && e.Control == true)
+            {
+                string newchar = "³";
+                int selectedIndex = Zeile2.SelectionStart;
+                Zeile2.Text = Zeile2.Text.Insert(selectedIndex, newchar);
+                Zeile2.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D4 && e.Control == true)
+            {
+                string newchar = "@";
+                int selectedIndex = Zeile2.SelectionStart;
+                Zeile2.Text = Zeile2.Text.Insert(selectedIndex, newchar);
+                Zeile2.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D5 && e.Control == true)
+            {
+                string newchar = "µ";
+                int selectedIndex = Zeile2.SelectionStart;
+                Zeile2.Text = Zeile2.Text.Insert(selectedIndex, newchar);
+                Zeile2.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.Oemcomma && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile2.SelectionStart;
+                Zeile2.Text = Zeile2.Text.Insert(selectedIndex, newchar);
+                Zeile2.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.OemPeriod && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile2.SelectionStart;
+                Zeile2.Text = Zeile2.Text.Insert(selectedIndex, newchar);
+                Zeile2.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.F12)
+            {
+                string newchar = "@-@";
+                int selectedIndex = Zeile2.SelectionStart;
+                Zeile2.Text = Zeile2.Text.Insert(selectedIndex, newchar);
+                Zeile2.SelectionStart = selectedIndex + 3;
             }
         }
 
@@ -62,6 +214,56 @@ namespace Querdruck
             {
                 Zeile4.Focus();
                 e.Handled = e.SuppressKeyPress = true;
+                return;
+            }
+            if (e.KeyCode == Keys.D2 && e.Control == true)
+            {
+                string newchar = "²";
+                int selectedIndex = Zeile3.SelectionStart;
+                Zeile3.Text = Zeile3.Text.Insert(selectedIndex, newchar);
+                Zeile3.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D3 && e.Control == true)
+            {
+                string newchar = "³";
+                int selectedIndex = Zeile3.SelectionStart;
+                Zeile3.Text = Zeile3.Text.Insert(selectedIndex, newchar);
+                Zeile3.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D4 && e.Control == true)
+            {
+                string newchar = "@";
+                int selectedIndex = Zeile3.SelectionStart;
+                Zeile3.Text = Zeile3.Text.Insert(selectedIndex, newchar);
+                Zeile3.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D5 && e.Control == true)
+            {
+                string newchar = "µ";
+                int selectedIndex = Zeile3.SelectionStart;
+                Zeile3.Text = Zeile3.Text.Insert(selectedIndex, newchar);
+                Zeile3.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.Oemcomma && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile3.SelectionStart;
+                Zeile3.Text = Zeile3.Text.Insert(selectedIndex, newchar);
+                Zeile3.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.OemPeriod && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile3.SelectionStart;
+                Zeile3.Text = Zeile3.Text.Insert(selectedIndex, newchar);
+                Zeile3.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.F12)
+            {
+                string newchar = "@-@";
+                int selectedIndex = Zeile3.SelectionStart;
+                Zeile3.Text = Zeile3.Text.Insert(selectedIndex, newchar);
+                Zeile3.SelectionStart = selectedIndex + 3;
             }
         }
 
@@ -71,6 +273,56 @@ namespace Querdruck
             {
                 Zeile5.Focus();
                 e.Handled = e.SuppressKeyPress = true;
+                return;
+            }
+            if (e.KeyCode == Keys.D2 && e.Control == true)
+            {
+                string newchar = "²";
+                int selectedIndex = Zeile4.SelectionStart;
+                Zeile4.Text = Zeile4.Text.Insert(selectedIndex, newchar);
+                Zeile4.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D3 && e.Control == true)
+            {
+                string newchar = "³";
+                int selectedIndex = Zeile4.SelectionStart;
+                Zeile4.Text = Zeile4.Text.Insert(selectedIndex, newchar);
+                Zeile4.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D4 && e.Control == true)
+            {
+                string newchar = "@";
+                int selectedIndex = Zeile4.SelectionStart;
+                Zeile4.Text = Zeile4.Text.Insert(selectedIndex, newchar);
+                Zeile4.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D5 && e.Control == true)
+            {
+                string newchar = "µ";
+                int selectedIndex = Zeile4.SelectionStart;
+                Zeile4.Text = Zeile4.Text.Insert(selectedIndex, newchar);
+                Zeile4.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.Oemcomma && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile4.SelectionStart;
+                Zeile4.Text = Zeile4.Text.Insert(selectedIndex, newchar);
+                Zeile4.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.OemPeriod && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile4.SelectionStart;
+                Zeile4.Text = Zeile4.Text.Insert(selectedIndex, newchar);
+                Zeile4.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.F12)
+            {
+                string newchar = "@-@";
+                int selectedIndex = Zeile4.SelectionStart;
+                Zeile4.Text = Zeile4.Text.Insert(selectedIndex, newchar);
+                Zeile4.SelectionStart = selectedIndex + 3;
             }
         }
 
@@ -80,6 +332,56 @@ namespace Querdruck
             {
                 Zeile6.Focus();
                 e.Handled = e.SuppressKeyPress = true;
+                return;
+            }
+            if (e.KeyCode == Keys.D2 && e.Control == true)
+            {
+                string newchar = "²";
+                int selectedIndex = Zeile5.SelectionStart;
+                Zeile5.Text = Zeile5.Text.Insert(selectedIndex, newchar);
+                Zeile5.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D3 && e.Control == true)
+            {
+                string newchar = "³";
+                int selectedIndex = Zeile5.SelectionStart;
+                Zeile5.Text = Zeile5.Text.Insert(selectedIndex, newchar);
+                Zeile5.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D4 && e.Control == true)
+            {
+                string newchar = "@";
+                int selectedIndex = Zeile5.SelectionStart;
+                Zeile5.Text = Zeile5.Text.Insert(selectedIndex, newchar);
+                Zeile5.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D5 && e.Control == true)
+            {
+                string newchar = "µ";
+                int selectedIndex = Zeile5.SelectionStart;
+                Zeile5.Text = Zeile5.Text.Insert(selectedIndex, newchar);
+                Zeile5.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.Oemcomma && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile5.SelectionStart;
+                Zeile5.Text = Zeile5.Text.Insert(selectedIndex, newchar);
+                Zeile5.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.OemPeriod && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile5.SelectionStart;
+                Zeile5.Text = Zeile5.Text.Insert(selectedIndex, newchar);
+                Zeile5.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.F12)
+            {
+                string newchar = "@-@";
+                int selectedIndex = Zeile5.SelectionStart;
+                Zeile5.Text = Zeile5.Text.Insert(selectedIndex, newchar);
+                Zeile5.SelectionStart = selectedIndex + 3;
             }
         }
 
@@ -89,6 +391,56 @@ namespace Querdruck
             {
                 Zeile7.Focus();
                 e.Handled = e.SuppressKeyPress = true;
+                return;
+            }
+            if (e.KeyCode == Keys.D2 && e.Control == true)
+            {
+                string newchar = "²";
+                int selectedIndex = Zeile6.SelectionStart;
+                Zeile6.Text = Zeile6.Text.Insert(selectedIndex, newchar);
+                Zeile6.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D3 && e.Control == true)
+            {
+                string newchar = "³";
+                int selectedIndex = Zeile6.SelectionStart;
+                Zeile6.Text = Zeile6.Text.Insert(selectedIndex, newchar);
+                Zeile6.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D4 && e.Control == true)
+            {
+                string newchar = "@";
+                int selectedIndex = Zeile6.SelectionStart;
+                Zeile6.Text = Zeile6.Text.Insert(selectedIndex, newchar);
+                Zeile6.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D5 && e.Control == true)
+            {
+                string newchar = "µ";
+                int selectedIndex = Zeile6.SelectionStart;
+                Zeile6.Text = Zeile6.Text.Insert(selectedIndex, newchar);
+                Zeile6.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.Oemcomma && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile6.SelectionStart;
+                Zeile6.Text = Zeile6.Text.Insert(selectedIndex, newchar);
+                Zeile6.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.OemPeriod && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile6.SelectionStart;
+                Zeile6.Text = Zeile6.Text.Insert(selectedIndex, newchar);
+                Zeile6.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.F12)
+            {
+                string newchar = "@-@";
+                int selectedIndex = Zeile6.SelectionStart;
+                Zeile6.Text = Zeile6.Text.Insert(selectedIndex, newchar);
+                Zeile6.SelectionStart = selectedIndex + 3;
             }
         }
 
@@ -98,6 +450,56 @@ namespace Querdruck
             {
                 Zeile8.Focus();
                 e.Handled = e.SuppressKeyPress = true;
+                return;
+            }
+            if (e.KeyCode == Keys.D2 && e.Control == true)
+            {
+                string newchar = "²";
+                int selectedIndex = Zeile7.SelectionStart;
+                Zeile7.Text = Zeile7.Text.Insert(selectedIndex, newchar);
+                Zeile7.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D3 && e.Control == true)
+            {
+                string newchar = "³";
+                int selectedIndex = Zeile7.SelectionStart;
+                Zeile7.Text = Zeile7.Text.Insert(selectedIndex, newchar);
+                Zeile7.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D4 && e.Control == true)
+            {
+                string newchar = "@";
+                int selectedIndex = Zeile7.SelectionStart;
+                Zeile7.Text = Zeile7.Text.Insert(selectedIndex, newchar);
+                Zeile7.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D5 && e.Control == true)
+            {
+                string newchar = "µ";
+                int selectedIndex = Zeile7.SelectionStart;
+                Zeile7.Text = Zeile7.Text.Insert(selectedIndex, newchar);
+                Zeile7.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.Oemcomma && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile7.SelectionStart;
+                Zeile7.Text = Zeile7.Text.Insert(selectedIndex, newchar);
+                Zeile7.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.OemPeriod && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile7.SelectionStart;
+                Zeile7.Text = Zeile7.Text.Insert(selectedIndex, newchar);
+                Zeile7.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.F12)
+            {
+                string newchar = "@-@";
+                int selectedIndex = Zeile7.SelectionStart;
+                Zeile7.Text = Zeile7.Text.Insert(selectedIndex, newchar);
+                Zeile7.SelectionStart = selectedIndex + 3;
             }
         }
 
@@ -107,6 +509,56 @@ namespace Querdruck
             {
                 Zeile9.Focus();
                 e.Handled = e.SuppressKeyPress = true;
+                return;
+            }
+            if (e.KeyCode == Keys.D2 && e.Control == true)
+            {
+                string newchar = "²";
+                int selectedIndex = Zeile8.SelectionStart;
+                Zeile8.Text = Zeile8.Text.Insert(selectedIndex, newchar);
+                Zeile8.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D3 && e.Control == true)
+            {
+                string newchar = "³";
+                int selectedIndex = Zeile8.SelectionStart;
+                Zeile8.Text = Zeile8.Text.Insert(selectedIndex, newchar);
+                Zeile8.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D4 && e.Control == true)
+            {
+                string newchar = "@";
+                int selectedIndex = Zeile8.SelectionStart;
+                Zeile8.Text = Zeile8.Text.Insert(selectedIndex, newchar);
+                Zeile8.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D5 && e.Control == true)
+            {
+                string newchar = "µ";
+                int selectedIndex = Zeile8.SelectionStart;
+                Zeile8.Text = Zeile8.Text.Insert(selectedIndex, newchar);
+                Zeile8.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.Oemcomma && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile8.SelectionStart;
+                Zeile8.Text = Zeile8.Text.Insert(selectedIndex, newchar);
+                Zeile8.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.OemPeriod && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile8.SelectionStart;
+                Zeile8.Text = Zeile8.Text.Insert(selectedIndex, newchar);
+                Zeile8.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.F12)
+            {
+                string newchar = "@-@";
+                int selectedIndex = Zeile8.SelectionStart;
+                Zeile8.Text = Zeile8.Text.Insert(selectedIndex, newchar);
+                Zeile8.SelectionStart = selectedIndex + 3;
             }
         }
 
@@ -116,6 +568,56 @@ namespace Querdruck
             {
                 Zeile10.Focus();
                 e.Handled = e.SuppressKeyPress = true;
+                return;
+            }
+            if (e.KeyCode == Keys.D2 && e.Control == true)
+            {
+                string newchar = "²";
+                int selectedIndex = Zeile9.SelectionStart;
+                Zeile9.Text = Zeile9.Text.Insert(selectedIndex, newchar);
+                Zeile9.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D3 && e.Control == true)
+            {
+                string newchar = "³";
+                int selectedIndex = Zeile9.SelectionStart;
+                Zeile9.Text = Zeile9.Text.Insert(selectedIndex, newchar);
+                Zeile9.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D4 && e.Control == true)
+            {
+                string newchar = "@";
+                int selectedIndex = Zeile9.SelectionStart;
+                Zeile9.Text = Zeile9.Text.Insert(selectedIndex, newchar);
+                Zeile9.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D5 && e.Control == true)
+            {
+                string newchar = "µ";
+                int selectedIndex = Zeile9.SelectionStart;
+                Zeile9.Text = Zeile9.Text.Insert(selectedIndex, newchar);
+                Zeile9.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.Oemcomma && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile9.SelectionStart;
+                Zeile9.Text = Zeile9.Text.Insert(selectedIndex, newchar);
+                Zeile9.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.OemPeriod && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile9.SelectionStart;
+                Zeile9.Text = Zeile9.Text.Insert(selectedIndex, newchar);
+                Zeile9.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.F12)
+            {
+                string newchar = "@-@";
+                int selectedIndex = Zeile9.SelectionStart;
+                Zeile9.Text = Zeile9.Text.Insert(selectedIndex, newchar);
+                Zeile9.SelectionStart = selectedIndex + 3;
             }
         }
 
@@ -125,6 +627,56 @@ namespace Querdruck
             {
                 Zeile11.Focus();
                 e.Handled = e.SuppressKeyPress = true;
+                return;
+            }
+            if (e.KeyCode == Keys.D2 && e.Control == true)
+            {
+                string newchar = "²";
+                int selectedIndex = Zeile10.SelectionStart;
+                Zeile10.Text = Zeile10.Text.Insert(selectedIndex, newchar);
+                Zeile10.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D3 && e.Control == true)
+            {
+                string newchar = "³";
+                int selectedIndex = Zeile10.SelectionStart;
+                Zeile10.Text = Zeile10.Text.Insert(selectedIndex, newchar);
+                Zeile10.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D4 && e.Control == true)
+            {
+                string newchar = "@";
+                int selectedIndex = Zeile10.SelectionStart;
+                Zeile10.Text = Zeile10.Text.Insert(selectedIndex, newchar);
+                Zeile10.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D5 && e.Control == true)
+            {
+                string newchar = "µ";
+                int selectedIndex = Zeile10.SelectionStart;
+                Zeile10.Text = Zeile10.Text.Insert(selectedIndex, newchar);
+                Zeile10.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.Oemcomma && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile10.SelectionStart;
+                Zeile10.Text = Zeile10.Text.Insert(selectedIndex, newchar);
+                Zeile10.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.OemPeriod && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile10.SelectionStart;
+                Zeile10.Text = Zeile10.Text.Insert(selectedIndex, newchar);
+                Zeile10.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.F12)
+            {
+                string newchar = "@-@";
+                int selectedIndex = Zeile10.SelectionStart;
+                Zeile10.Text = Zeile10.Text.Insert(selectedIndex, newchar);
+                Zeile10.SelectionStart = selectedIndex + 3;
             }
         }
 
@@ -134,6 +686,56 @@ namespace Querdruck
             {
                 Zeile12.Focus();
                 e.Handled = e.SuppressKeyPress = true;
+                return;
+            }
+            if (e.KeyCode == Keys.D2 && e.Control == true)
+            {
+                string newchar = "²";
+                int selectedIndex = Zeile11.SelectionStart;
+                Zeile11.Text = Zeile11.Text.Insert(selectedIndex, newchar);
+                Zeile11.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D3 && e.Control == true)
+            {
+                string newchar = "³";
+                int selectedIndex = Zeile11.SelectionStart;
+                Zeile11.Text = Zeile11.Text.Insert(selectedIndex, newchar);
+                Zeile11.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D4 && e.Control == true)
+            {
+                string newchar = "@";
+                int selectedIndex = Zeile11.SelectionStart;
+                Zeile11.Text = Zeile11.Text.Insert(selectedIndex, newchar);
+                Zeile11.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D5 && e.Control == true)
+            {
+                string newchar = "µ";
+                int selectedIndex = Zeile11.SelectionStart;
+                Zeile11.Text = Zeile11.Text.Insert(selectedIndex, newchar);
+                Zeile11.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.Oemcomma && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile11.SelectionStart;
+                Zeile11.Text = Zeile11.Text.Insert(selectedIndex, newchar);
+                Zeile11.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.OemPeriod && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile11.SelectionStart;
+                Zeile11.Text = Zeile11.Text.Insert(selectedIndex, newchar);
+                Zeile11.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.F12)
+            {
+                string newchar = "@-@";
+                int selectedIndex = Zeile11.SelectionStart;
+                Zeile11.Text = Zeile11.Text.Insert(selectedIndex, newchar);
+                Zeile11.SelectionStart = selectedIndex + 3;
             }
         }
 
@@ -143,6 +745,56 @@ namespace Querdruck
             {
                 Zeile13.Focus();
                 e.Handled = e.SuppressKeyPress = true;
+                return;
+            }
+            if (e.KeyCode == Keys.D2 && e.Control == true)
+            {
+                string newchar = "²";
+                int selectedIndex = Zeile12.SelectionStart;
+                Zeile12.Text = Zeile12.Text.Insert(selectedIndex, newchar);
+                Zeile12.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D3 && e.Control == true)
+            {
+                string newchar = "³";
+                int selectedIndex = Zeile12.SelectionStart;
+                Zeile12.Text = Zeile12.Text.Insert(selectedIndex, newchar);
+                Zeile12.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D4 && e.Control == true)
+            {
+                string newchar = "@";
+                int selectedIndex = Zeile12.SelectionStart;
+                Zeile12.Text = Zeile12.Text.Insert(selectedIndex, newchar);
+                Zeile12.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D5 && e.Control == true)
+            {
+                string newchar = "µ";
+                int selectedIndex = Zeile12.SelectionStart;
+                Zeile12.Text = Zeile12.Text.Insert(selectedIndex, newchar);
+                Zeile12.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.Oemcomma && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile12.SelectionStart;
+                Zeile12.Text = Zeile12.Text.Insert(selectedIndex, newchar);
+                Zeile12.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.OemPeriod && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile12.SelectionStart;
+                Zeile12.Text = Zeile12.Text.Insert(selectedIndex, newchar);
+                Zeile12.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.F12)
+            {
+                string newchar = "@-@";
+                int selectedIndex = Zeile12.SelectionStart;
+                Zeile12.Text = Zeile12.Text.Insert(selectedIndex, newchar);
+                Zeile12.SelectionStart = selectedIndex + 3;
             }
         }
 
@@ -152,6 +804,56 @@ namespace Querdruck
             {
                 Zeile14.Focus();
                 e.Handled = e.SuppressKeyPress = true;
+                return;
+            }
+            if (e.KeyCode == Keys.D2 && e.Control == true)
+            {
+                string newchar = "²";
+                int selectedIndex = Zeile13.SelectionStart;
+                Zeile13.Text = Zeile13.Text.Insert(selectedIndex, newchar);
+                Zeile13.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D3 && e.Control == true)
+            {
+                string newchar = "³";
+                int selectedIndex = Zeile13.SelectionStart;
+                Zeile13.Text = Zeile13.Text.Insert(selectedIndex, newchar);
+                Zeile13.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D4 && e.Control == true)
+            {
+                string newchar = "@";
+                int selectedIndex = Zeile13.SelectionStart;
+                Zeile13.Text = Zeile13.Text.Insert(selectedIndex, newchar);
+                Zeile13.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D5 && e.Control == true)
+            {
+                string newchar = "µ";
+                int selectedIndex = Zeile13.SelectionStart;
+                Zeile13.Text = Zeile13.Text.Insert(selectedIndex, newchar);
+                Zeile13.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.Oemcomma && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile13.SelectionStart;
+                Zeile13.Text = Zeile13.Text.Insert(selectedIndex, newchar);
+                Zeile13.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.OemPeriod && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile13.SelectionStart;
+                Zeile13.Text = Zeile13.Text.Insert(selectedIndex, newchar);
+                Zeile13.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.F12)
+            {
+                string newchar = "@-@";
+                int selectedIndex = Zeile13.SelectionStart;
+                Zeile13.Text = Zeile13.Text.Insert(selectedIndex, newchar);
+                Zeile13.SelectionStart = selectedIndex + 3;
             }
         }
 
@@ -161,9 +863,112 @@ namespace Querdruck
             {
                 Zeile15.Focus();
                 e.Handled = e.SuppressKeyPress = true;
+                return;
+            }
+            if (e.KeyCode == Keys.D2 && e.Control == true)
+            {
+                string newchar = "²";
+                int selectedIndex = Zeile14.SelectionStart;
+                Zeile14.Text = Zeile14.Text.Insert(selectedIndex, newchar);
+                Zeile14.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D3 && e.Control == true)
+            {
+                string newchar = "³";
+                int selectedIndex = Zeile14.SelectionStart;
+                Zeile14.Text = Zeile14.Text.Insert(selectedIndex, newchar);
+                Zeile14.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D4 && e.Control == true)
+            {
+                string newchar = "@";
+                int selectedIndex = Zeile14.SelectionStart;
+                Zeile14.Text = Zeile14.Text.Insert(selectedIndex, newchar);
+                Zeile14.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D5 && e.Control == true)
+            {
+                string newchar = "µ";
+                int selectedIndex = Zeile14.SelectionStart;
+                Zeile14.Text = Zeile14.Text.Insert(selectedIndex, newchar);
+                Zeile14.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.Oemcomma && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile14.SelectionStart;
+                Zeile14.Text = Zeile14.Text.Insert(selectedIndex, newchar);
+                Zeile14.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.OemPeriod && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile14.SelectionStart;
+                Zeile14.Text = Zeile14.Text.Insert(selectedIndex, newchar);
+                Zeile14.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.F12)
+            {
+                string newchar = "@-@";
+                int selectedIndex = Zeile14.SelectionStart;
+                Zeile14.Text = Zeile14.Text.Insert(selectedIndex, newchar);
+                Zeile14.SelectionStart = selectedIndex + 3;
             }
         }
-       
+
+        private void Zeile15_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.D2 && e.Control == true)
+            {
+                string newchar = "²";
+                int selectedIndex = Zeile15.SelectionStart;
+                Zeile15.Text = Zeile15.Text.Insert(selectedIndex, newchar);
+                Zeile15.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D3 && e.Control == true)
+            {
+                string newchar = "³";
+                int selectedIndex = Zeile15.SelectionStart;
+                Zeile15.Text = Zeile15.Text.Insert(selectedIndex, newchar);
+                Zeile15.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D4 && e.Control == true)
+            {
+                string newchar = "@";
+                int selectedIndex = Zeile15.SelectionStart;
+                Zeile15.Text = Zeile15.Text.Insert(selectedIndex, newchar);
+                Zeile15.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.D5 && e.Control == true)
+            {
+                string newchar = "µ";
+                int selectedIndex = Zeile15.SelectionStart;
+                Zeile15.Text = Zeile15.Text.Insert(selectedIndex, newchar);
+                Zeile15.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.Oemcomma && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile15.SelectionStart;
+                Zeile15.Text = Zeile15.Text.Insert(selectedIndex, newchar);
+                Zeile15.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.OemPeriod && e.Control == true)
+            {
+                string newchar = "|";
+                int selectedIndex = Zeile15.SelectionStart;
+                Zeile15.Text = Zeile15.Text.Insert(selectedIndex, newchar);
+                Zeile15.SelectionStart = selectedIndex + 1;
+            }
+            if (e.KeyCode == Keys.F12)
+            {
+                string newchar = "@-@";
+                int selectedIndex = Zeile15.SelectionStart;
+                Zeile15.Text = Zeile15.Text.Insert(selectedIndex, newchar);
+                Zeile15.SelectionStart = selectedIndex + 3;
+            }
+        }
+
         // Nur Nummer in "Sperren" erlauben
         private void Sperren1_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -851,37 +1656,97 @@ namespace Querdruck
         // "Länge" berechnen
         private void SchritGrößeÄndernFürLänge(TextBox Zeile, TextBox Laenge)
         {
+            
             if (Zeile.Text == "")
             {
                 Laenge.Text = "";
                 return;
             }
+
+            TextBox ActualSperren;
+            if (Zeile == Zeile1) { ActualSperren = Sperren1; }
+            else if (Zeile == Zeile2) { ActualSperren = Sperren2; }
+            else if (Zeile == Zeile3) { ActualSperren = Sperren3; }
+            else if (Zeile == Zeile4) { ActualSperren = Sperren4; }
+            else if (Zeile == Zeile5) { ActualSperren = Sperren5; }
+            else if (Zeile == Zeile6) { ActualSperren = Sperren6; }
+            else if (Zeile == Zeile7) { ActualSperren = Sperren7; }
+            else if (Zeile == Zeile8) { ActualSperren = Sperren8; }
+            else if (Zeile == Zeile9) { ActualSperren = Sperren9; }
+            else if (Zeile == Zeile10) { ActualSperren = Sperren10; }
+            else if (Zeile == Zeile11) { ActualSperren = Sperren11; }
+            else if (Zeile == Zeile12) { ActualSperren = Sperren12; }
+            else if (Zeile == Zeile13) { ActualSperren = Sperren13; }
+            else if (Zeile == Zeile14) { ActualSperren = Sperren14; }
+            else { ActualSperren = Sperren15; }
+            bool nichtleersperren = (!string.IsNullOrEmpty(ActualSperren.Text));
             string connStr = "server=localhost;user=root;database=movedb;port=3306;password=6540";
             MySqlConnection conn = new MySqlConnection(connStr);
             try
             {
                 conn.Open();
-                string x = Zeile.Text;
+                string x = Zeile.Text.Trim();
                 double y = 0;
+                string strC = "";
                 foreach (char c in x)
                 {
-                    string sql = "select Breite from Tabelle" + Schriftgröße + " where Zeichen = '" + c + "' COLLATE utf8mb4_bin;";
+                    if (c == '\\') { strC = "\\\\"; }
+                    else if (c == '\'') { strC = "\\\'"; }
+                    else { strC = c.ToString(); }
+                    string sql = "select Breite from Tabelle" + (Schriftgröße + 3) + " where Zeichen = '" + strC + "' COLLATE utf8mb4_bin;";
                     MySqlCommand cmd = new MySqlCommand(sql, conn);
                     MySqlDataReader rdr = cmd.ExecuteReader();
-                    while (rdr.Read())
+                    if (nichtleersperren)
                     {
-                        y += Int32.Parse(rdr[0].ToString());
+                        while (rdr.Read())
+                        {
+                            y += Int32.Parse(rdr[0].ToString()) + (Int32.Parse(ActualSperren.Text) * 4);
+                        }
+                    }
+                    else
+                    {
+                        while (rdr.Read())
+                        {
+                            y += Int32.Parse(rdr[0].ToString());
+                        }
                     }
                     rdr.Close();
                 }
+                if (nichtleersperren) y -= Int32.Parse(ActualSperren.Text);
                 y /= 10;
                 Laenge.Text = y.ToString();
+                CheckLängsteZeile(Laenge);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
             conn.Close();
+        }
+        
+        // Die längste Zeile finden und mit Rot färben
+        private void CheckLängsteZeile(TextBox Laenge)
+        {
+            if (string.IsNullOrEmpty(Laenge.Text)) return;
+            List<TextBox> textBoxes = new List<TextBox>
+            { LaengeZeile1, LaengeZeile2, LaengeZeile3, LaengeZeile4,
+              LaengeZeile5, LaengeZeile6, LaengeZeile7, LaengeZeile8,
+              LaengeZeile9, LaengeZeile10, LaengeZeile11, LaengeZeile12,
+              LaengeZeile13, LaengeZeile14, LaengeZeile15};
+
+            TextBox Höhste = Laenge;
+            foreach (TextBox tb in textBoxes)
+            {
+                if (tb == Höhste) continue;
+                else if (string.IsNullOrEmpty(tb.Text))
+                {
+                    tb.BackColor = Color.White;
+                    continue;
+                }
+                if (Convert.ToDouble(tb.Text) > Convert.ToDouble(Höhste.Text)) Höhste = tb;
+                else { tb.BackColor = Color.White; }
+            }
+            Höhste.BackColor = Color.LightPink;
         }
 
         // Schicken die Zeielen um ihre Länge zu berechnen
@@ -960,31 +1825,144 @@ namespace Querdruck
             SchritGrößeÄndernFürLänge(Zeile15, LaengeZeile15);
         }
 
+        // die Länge der Zeilen berechnen, nachdem wir die Werte von Sperren ändern
+        private void Sperren1_TextChanged(object sender, EventArgs e)
+        {
+            SchritGrößeÄndernFürLänge(Zeile1, LaengeZeile1);
+        }
+
+        private void Sperren2_TextChanged(object sender, EventArgs e)
+        {
+            SchritGrößeÄndernFürLänge(Zeile2, LaengeZeile2);
+        }
+
+        private void Sperren3_TextChanged(object sender, EventArgs e)
+        {
+            SchritGrößeÄndernFürLänge(Zeile3, LaengeZeile3);
+        }
+
+        private void Sperren4_TextChanged(object sender, EventArgs e)
+        {
+            SchritGrößeÄndernFürLänge(Zeile4, LaengeZeile4);
+        }
+
+        private void Sperren5_TextChanged(object sender, EventArgs e)
+        {
+            SchritGrößeÄndernFürLänge(Zeile5, LaengeZeile5);
+        }
+
+        private void Sperren6_TextChanged(object sender, EventArgs e)
+        {
+            SchritGrößeÄndernFürLänge(Zeile6, LaengeZeile6);
+        }
+
+        private void Sperren7_TextChanged(object sender, EventArgs e)
+        {
+            SchritGrößeÄndernFürLänge(Zeile7, LaengeZeile7);
+        }
+
+        private void Sperren8_TextChanged(object sender, EventArgs e)
+        {
+            SchritGrößeÄndernFürLänge(Zeile8, LaengeZeile8);
+        }
+
+        private void Sperren9_TextChanged(object sender, EventArgs e)
+        {
+            SchritGrößeÄndernFürLänge(Zeile9, LaengeZeile9);
+        }
+
+        private void Sperren10_TextChanged(object sender, EventArgs e)
+        {
+            SchritGrößeÄndernFürLänge(Zeile10, LaengeZeile10);
+        }
+
+        private void Sperren11_TextChanged(object sender, EventArgs e)
+        {
+            SchritGrößeÄndernFürLänge(Zeile11, LaengeZeile11);
+        }
+
+        private void AutoSuchen_Click(object sender, EventArgs e)
+        {
+            if (Bearbeiten_Mode)
+            {
+                DialogResult dr;
+                dr = MessageBox.Show("Änderungen speichern?", "", MessageBoxButtons.YesNo);
+                if (dr == DialogResult.Yes)
+                {
+                    DruckÄndern(AktuellDatei);
+                }
+                else if (dr == DialogResult.No)
+                {
+                    return;
+                }
+            }
+        }
+
+        private void Sperren12_TextChanged(object sender, EventArgs e)
+        {
+            SchritGrößeÄndernFürLänge(Zeile12, LaengeZeile12);
+        }
+
+        private void Sperren13_TextChanged(object sender, EventArgs e)
+        {
+            SchritGrößeÄndernFürLänge(Zeile13, LaengeZeile13);
+        }
+
+        private void Sperren14_TextChanged(object sender, EventArgs e)
+        {
+            SchritGrößeÄndernFürLänge(Zeile14, LaengeZeile14);
+        }
+
+        private void Sperren15_TextChanged(object sender, EventArgs e)
+        {
+            SchritGrößeÄndernFürLänge(Zeile15, LaengeZeile15);
+        }
+
         private void FensterWechseln_Click(object sender, EventArgs e)
         {
             if (Bearbeiten_Mode == true)
             {
-                DruckMode();
                 Bearbeiten_Mode = false;
+                OpenPorts();
+                if (!Stempel_prüfen())
+                {
+                    MessageBox.Show("Ventil machen!");
+                    ClosePorts();
+                    return;
+                }
+                if (!Bandhalter_prüfen())
+                {
+                    MessageBox.Show("Bandhalter schließen!");
+                    ClosePorts();
+                    return;
+                }
+                DruckMode();
             } 
             else
             {
                 BearbeitenMode();
                 Bearbeiten_Mode = true;
+                ClosePorts();
             }
             
+        }
+
+        private void ClosePorts()
+        {
+            myport.Close();
+            myport2.Close();
         }
 
         // "Breite" zum Index Nummer konvertieren (So ist es in der MS-Datenbank)
         private int BreiteToDatenBank(int Breite)
         {
-            if (Breite == 75) return 1;
-            else if (Breite == 100) return 2;
-            else if (Breite == 125) return 3;
-            else if (Breite == 150) return 4;
-            else if (Breite == 175) return 5;
-            else if (Breite == 200) return 6;
-            else if (Breite == 225) return 7;
+            if (Breite == 75) return 0;
+            else if (Breite == 100) return 1;
+            else if (Breite == 125) return 2;
+            else if (Breite == 150) return 3;
+            else if (Breite == 175) return 4;
+            else if (Breite == 200) return 5;
+            else if (Breite == 225) return 6;
             else return -1;
         }
 
@@ -1146,20 +2124,18 @@ namespace Querdruck
                     if (ArchivCheckBox.Checked && !DruckCheckBox.Checked)
                     {
                         DruckSpeichern("Archiv");
-                        MessageBox.Show("Der Druck wurde in Archiv gespeichert");
                     }
                     else if (!ArchivCheckBox.Checked)
                     {
                         DruckSpeichern("Druckdatei");
-                        MessageBox.Show("Der Druck wurde in Druckdatei gespeichert");
                     }
                     else if (ArchivCheckBox.Checked && DruckCheckBox.Checked)
                     {
                         DruckSpeichern("Archiv");
                         DruckSpeichern("Druckdatei");
-                        MessageBox.Show("Der Druck wurde in Druckdatei und Archiv gespeichert");
                     }
                     EmptyTheFields();
+                    AutoSuchen.Visible = false;
                 }
                 catch (Exception ex)
                 {
@@ -1168,9 +2144,846 @@ namespace Querdruck
             }
             else
             {
-                // muss geändert werden
+                if (!Referencefahrt_done)
+                {
+                    MessageBox.Show("Eine Referenzfahrt ist vorher nötig!");
+                    return;
+                }
+                if (Platte_prüfen() != (SchriftGröße.SelectedIndex + 4).ToString())
+                {
+                    MessageBox.Show("Bitte die richtige Platte benutzen!");
+                    return;
+                }
+                if (!Bandhalter_prüfen())
+                {
+                    MessageBox.Show("Bandhalter schließen!");
+                    return;
+                }
+                if (Schriftgröße == -1)
+                {
+                    MessageBox.Show("Bitte Schriftgröße wählen!");
+                    return;
+                }
+                if (string.IsNullOrEmpty(Hoehe1.Text))
+                {
+                    MessageBox.Show("Bitte Höhe wählen!");
+                    return;
+                }
+
+                string Zum_Drucken = Zeile1.Text.Trim();
+                if (string.IsNullOrEmpty(Zum_Drucken)) return;
+                else
+                {
+                    int Sprr = (!string.IsNullOrEmpty(Sperren1.Text)) ? Int32.Parse(Sperren1.Text) : 0;
+                    Motore_3_Drehen(((AbstandVonAussen.Value - 40) * 40).ToString());
+                    Tisch_init = (Int32.Parse(Hoehe1.Text) * 40) - 600;
+                    Motore_4_Drehen_Absolut(Tisch_init.ToString());
+                    for (int x = Zum_Drucken.Length; x > 0; x--)
+                    {
+                        int M3;
+                        try
+                        {
+                            if (x == Zum_Drucken.Length)
+                            {
+                                M3 = Convert.ToInt32(Zeichen_Breite(Zum_Drucken[x - 1]) * 2);
+                                Motore_3_Drehen_Relativ(M3.ToString());
+                                if (SonderZeichen.Contains(Zum_Drucken[x - 1]))
+                                {
+                                    SonderZeichen_Drucken(Zum_Drucken[x - 1]);
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                M3 = Convert.ToInt32((Zeichen_Breite(Zum_Drucken[x]) + Zeichen_Breite(Zum_Drucken[x - 1])) * 2);
+                                M3 += (Sprr * 20);
+                                Motore_3_Drehen_Relativ(M3.ToString());
+                                if (SonderZeichen.Contains(Zum_Drucken[x - 1]))
+                                {
+                                    SonderZeichen_Drucken(Zum_Drucken[x - 1]);
+                                    continue;
+                                }
+                            }
+                            MotorenDrehen(Zum_Drucken[x - 1]);
+                            Motoren_stehen();
+                            Stempel_ab(Zum_Drucken[x - 1]);
+                            Stempel_auf();
+                            Trennung_ein();
+                            bool Stmp = true;
+                            while (Stmp)
+                            {
+                                Stmp = !Stempel_prüfen();
+                            }
+                            Trennung_aus();
+
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.ToString());
+                        }
+                    }
+                    StartPunkt();
+                    Tisch_init = 0;
+                }
+            }
+        }
+
+        // Die Sonderzeichen Drucken
+        private void SonderZeichen_Drucken(char v)
+        {
+            char b = ' ';
+            char Sonder = ' ';
+
+            if (v == 'Ä')
+            {
+                b = 'A';
+                Sonder = '*';
+            }
+            else if (v == 'Ö')
+            {
+                b = 'O';
+                Sonder = '*';
+            }
+            else if (v == 'Ü')
+            {
+                b = 'U';
+                Sonder = '*';
+            }
+            else if (v == ':')
+            {
+                b = '.';
+                Sonder = '.';
+            }
+            else if (v == ';')
+            {
+                b = ',';
+                Sonder = '.';
+            }
+            else if (v == 'é')
+            {
+                b = 'e';
+                Sonder = '´';
+            }
+            else if (v == 'è')
+            {
+                b = 'e';
+                Sonder = '`';
+            }
+            else if (v == 'á')
+            {
+                b = 'a';
+                Sonder = '´';
+            }
+            else if (v == 'à')
+            {
+                b = 'a';
+                Sonder = '`';
+            }
+            else if (v == '|')
+            {
+                Motore_3_Drehen_Relativ((40 * Zeichen_Breite('|')).ToString());
                 return;
             }
+            else if (v == '²')
+            {
+                Motore_3_Drehen_Relativ((40 * Zeichen_Breite('²')).ToString());
+                return;
+            }
+            else if (v == '³')
+            {
+                Motore_3_Drehen_Relativ((40 * Zeichen_Breite('³')).ToString());
+                return;
+            }
+            else if (v == '$')
+            {
+                Motore_3_Drehen_Relativ((40 * Zeichen_Breite('$')).ToString());
+                return;
+            }
+            else if (v == '%')
+            {
+                Motore_3_Drehen_Relativ((40 * Zeichen_Breite('%')).ToString());
+                return;
+            }
+            else if (v == ' ')
+            {
+                Motore_3_Drehen_Relativ((40 * Zeichen_Breite(' ')).ToString());
+                return;
+            }
+            MotorenDrehen(b);
+            Motoren_stehen();
+            Stempel_ab(b);
+            Stempel_auf();
+            Trennung_ein();
+            bool Stmp = true;
+            while (Stmp)
+            {
+                Stmp = !Stempel_prüfen();
+            }
+            Trennung_aus();
+            MotorenDrehen(v);
+            Motoren_stehen();
+            MotorenDrehen(Sonder);
+            Motoren_stehen();
+            int M5 = Convert.ToInt32((Zeichen_Breite(v) + Zeichen_Breite(Sonder) * 0.12));
+            Stempel_ab(Sonder);
+            Stempel_auf();
+            Trennung_ein();
+            Stmp = true;
+            while (Stmp)
+            {
+                Stmp = !Stempel_prüfen();
+            }
+            Trennung_aus();
+        }
+
+        // Breite von Zeichen aufrufen
+        private int Zeichen_Breite(char c)
+        {
+            int y = 0;
+            string connStr = "server=localhost;user=root;database=movedb;port=3306;password=6540";
+            MySqlConnection conn = new MySqlConnection(connStr);
+            try
+            {
+                conn.Open();
+                string sql = "select Breite from Tabelle" + (Schriftgröße + 3) + " where Zeichen = '" + c + "' COLLATE utf8mb4_bin;";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    y += Int32.Parse(rdr[0].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            conn.Close();
+            return y;
+        }
+
+        // Trennt die Foile und Band (ein)
+        private void Trennung_ein()
+        {
+            myport.WriteLine("O41");
+        }
+
+        // Trennt die Foile und Band (aus)
+        private void Trennung_aus()
+        {
+            myport.WriteLine("O40");
+        }
+
+        // Stempel ab (nach unten bewegen)
+        private void Stempel_ab(char c)
+        {
+            int druck = 0;
+            string connStr = "server=localhost;user=root;database=movedb;port=3306;password=6540";
+            MySqlConnection conn = new MySqlConnection(connStr);
+            try
+            {
+                conn.Open();
+                string sql = "select Druck from Tabelle" + (Schriftgröße + 3) + " where Zeichen = '" + c + "' COLLATE utf8mb4_bin;";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    druck = Int32.Parse(rdr[0].ToString());
+                }
+                conn.Close();
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            Double dk = druck * Decimal.ToDouble(DruckStaerke.Value) / 550;
+            druck = Convert.ToInt32(dk);
+            myport.WriteLine("A" + druck.ToString()); // Schick PWM-signal von Arduino an Ventil 1
+            myport.WriteLine("O31"); // Pumpe einschalten
+            myport.WriteLine("O11"); // Ventil ab (nach unten)
+            Thread.Sleep(1000);
+        }
+
+        // Stempel auf (nach oben bewegen)
+        private void Stempel_auf()
+        {
+            myport.WriteLine("O10"); // Ventil 1  abschalten
+            Thread.Sleep(100);
+            myport.WriteLine("A130"); // Ventil 2 PWM-signal bekommen
+            myport.WriteLine("O21"); // Ventil 2 einschalten (nach oben)
+            Thread.Sleep(500);
+            myport.WriteLine("O20"); // Ventil 2 ausschalten
+            myport.WriteLine("O30"); // Pumpe aus
+        }
+
+        // Richtige Platte prüfen
+        private string Platte_prüfen()
+        {
+            myport.WriteLine("I1");
+            Thread.Sleep(100);
+            return myport.ReadExisting();
+        }
+
+        // Stempel prüfen
+        private bool Stempel_prüfen()
+        {
+            myport.WriteLine("I2");
+            Thread.Sleep(50);
+            string X = myport.ReadExisting();
+            return (X == "1");
+        }
+
+        
+
+        //Bandhalter prüfen
+        private bool Bandhalter_prüfen()
+        {
+            myport.WriteLine("I3"); //Bandhalter prüfen
+            Thread.Sleep(50);
+            string halter = myport.ReadExisting();
+            int X = Int32.Parse(halter);
+            return X != 0;
+        }
+
+        // Motoren 1,2 und 4 mit Drehen Anfangen
+        private void MotorenDrehen(char x)
+        {
+            int XPos = 0, YPos = 0, TischPos = 0;
+            string connStr = "server=localhost;user=root;database=movedb;port=3306;password=6540";
+            MySqlConnection conn = new MySqlConnection(connStr);
+            try
+            {
+                conn.Open();
+                string sql = "select XPos, YPos, TischPos from tabelle" + (Schriftgröße + 3) + " where Zeichen = '" + x + "' COLLATE utf8mb4_bin";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    XPos = Int32.Parse(rdr["XPos"].ToString());
+                    YPos = Int32.Parse(rdr["YPos"].ToString());
+                    TischPos = Int32.Parse(rdr["TischPos"].ToString());
+                }
+                rdr.Close();
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            if (XPos != 0 && YPos != 0)
+            {
+                // Motor 1
+                string message = "#1p2\r";  //Positionierart Absolut Motor 1
+                myport2.WriteLine(message);
+                Thread.Sleep(50);
+                string auslesen = myport2.ReadExisting();
+
+                message = "#1s" + XPos.ToString() + "\r";
+                myport2.WriteLine(message);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Thread.Sleep(100);
+
+                message = "#1A\r";
+                myport2.WriteLine(message);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+
+                // Motor 2
+                message = "#" + (char)2 + "p2\r";  //Positionierart Absolut Motor 2
+                myport2.WriteLine(message);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+
+                message = "#" + (char)2 + "d1\r"; //Drehrichtung links
+                myport2.WriteLine(message);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+
+                message = "#" + (char)2 + "s" + YPos.ToString() + "\r";
+                myport2.WriteLine(message);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+
+                message = "#" + (char)2 + "A\r";
+                myport2.WriteLine(message);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+            }
+
+            // Motor 4
+            if (TischPos != 0)
+            Motore_4_Drehen_Absolut((TischPos + Tisch_init).ToString());
+        }
+
+        // Motor 3 Absolut Drehen
+        private void Motore_3_Drehen(string x)
+        {
+            // Motor 3
+            string message = "#" + (char)3 + "p2\r";
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            string auslesen = myport2.ReadExisting();
+
+            message = "#" + (char)3 + "d2\r"; //Drehrichtung rechts
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            auslesen = myport2.ReadExisting();
+
+            message = "#" + (char)3 + "s" + x + "\r";
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            auslesen = myport2.ReadExisting();
+
+            message = "#" + (char)3 + "A\r";
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            auslesen = myport2.ReadExisting();
+        }
+
+        // Motor 3 Relativ Drehen
+        private void Motore_3_Drehen_Relativ(string x)
+        {
+            // Motor 3
+            string message = "#" + (char)3 + "p1\r";
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            string auslesen = myport2.ReadExisting();
+
+            message = "#" + (char)3 + "d1\r"; //Drehrichtung links
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            auslesen = myport2.ReadExisting();
+
+            message = "#" + (char)3 + "s" + x + "\r";
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            auslesen = myport2.ReadExisting();
+
+            message = "#" + (char)3 + "A\r";
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            auslesen = myport2.ReadExisting();
+        }
+
+        // Motor 4 Absolut Drehen
+        private void Motore_4_Drehen_Absolut(string x)
+        {
+            // Motor 4
+            string message = "#" + (char)4 + "p2\r";
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            string auslesen = myport2.ReadExisting();
+
+            message = "#" + (char)4 + "d1\r"; //Drehrichtung links
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            auslesen = myport2.ReadExisting();
+
+            message = "#" + (char)4 + "s" + x + "\r";
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            auslesen = myport2.ReadExisting();
+
+            message = "#" + (char)4 + "A\r";
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            auslesen = myport2.ReadExisting();
+        }
+
+        // Motor 4 Relativ Drehen
+        private void Motore_4_Drehen_Relativ(string x)
+        {
+            Tisch_init = Int32.Parse(x) - Tisch_init;
+            string Richtung = (Tisch_init > 0) ? "1" : "0";
+            // Motor 4
+            string message = "#" + (char)4 + "p1\r";
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            string auslesen = myport2.ReadExisting();
+
+            message = "#" + (char)4 + "d" + Richtung + "\r"; //Drehrichtung 
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            auslesen = myport2.ReadExisting();
+
+            message = "#" + (char)4 + "s" + Math.Abs(Tisch_init).ToString() + "\r";
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            auslesen = myport2.ReadExisting();
+
+            message = "#" + (char)4 + "A\r";
+            myport2.WriteLine(message);
+            Thread.Sleep(50);
+            auslesen = myport2.ReadExisting();
+            Tisch_init = Int32.Parse(x);
+        }
+
+        // Prüfen ob die Motoren stehen
+        private void Motoren_stehen()
+        {
+            int St1 = 0, St2 = 0, St3 = 0, St4 = 0, Status = 0;
+            string Daten, auslesen;
+            do
+            {
+                if (St1 < 1)
+                {
+                    Daten = "#1$\r";        // Status abfragen
+                    myport2.WriteLine(Daten);
+                    Thread.Sleep(100);
+                    auslesen = myport2.ReadExisting();
+                    Thread.Sleep(100);
+                    Thread.Sleep(100);
+                    if (auslesen.EndsWith("163\r") || auslesen.EndsWith("161\r"))
+                    {
+                        St1 = 1;
+                    }
+                }
+                if (St2 < 1)
+                {
+                    Daten = "#" + (char)2 + "$" + "\r";        // Status abfragen
+                    myport2.WriteLine(Daten);
+                    Thread.Sleep(100);
+                    auslesen = myport2.ReadExisting();
+                    if (auslesen.EndsWith("\r") || auslesen.EndsWith("\r"))
+                    {
+                        St2 = 1;
+                    }
+                }
+                if (St3 < 1)
+                {
+                    Daten = "#" + (char)3 + "$" + "\r";        // Status abfragen
+                    myport2.WriteLine(Daten);
+                    Thread.Sleep(100);
+                    auslesen = myport2.ReadExisting();
+                    //TbDaten.Text += auslesen;
+                    if (auslesen.EndsWith("\r") || auslesen.EndsWith("\r"))
+                    {
+                        St3 = 1;
+                    }
+                }
+                if (St4 < 1)
+                {
+                    Daten = "#" + (char)4 + "$" + "\r";        // Status abfragen
+                    myport2.WriteLine(Daten);
+                    Thread.Sleep(50);
+                    auslesen = myport2.ReadExisting();
+                    //TbDaten.Text += auslesen;
+                    if (auslesen.EndsWith("\r") || auslesen.EndsWith("\r"))
+                    {
+                        St4 = 1;
+                    }
+                }
+                Status = St1 + St2 + St3 + St4;
+            } while (Status < 4);
+        }
+
+        // Referenzfahrt
+        private void ReferenzFahrt_Click(object sender, EventArgs e)
+        {
+            if (!Bearbeiten_Mode)
+            {
+                string PArt = "4";
+                string FStart = "400";
+                string FMax = "1000";
+                string Rampe = "4";
+                string Rtg = "0";
+                int St1 = 0;
+                int St2 = 0;
+                int St3 = 0;
+                int St4 = 0;
+                int Status = 0;
+                //Bandhalter prüfen
+                myport2.ReadExisting();
+                string Daten = "#W1\r";       //Wiederholung 1x
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                string auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)2 + "W1\r";
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                //TbDaten.Text += auslesen;
+                Daten = "#" + (char)3 + "W1\r";
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                //TbDaten.Text += auslesen;
+                Daten = "#" + (char)4 + "W1\r";
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                //TbDaten.Text += auslesen;  
+                Daten = "#" + (char)2 + "leb1\r";    //Endschalter setzten
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)3 + "leb1\r";    //Endschalter setzten
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)4 + "leb1\r";    //Endschalter setzten
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                Daten = "#1p" + PArt + "\r";        //Positionierart setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                Daten = "#" + (char)2 + "p" + PArt + "\r";        //Positionierart setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)3 + "p" + PArt + "\r";        //Positionierart setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)4 + "p" + PArt + "\r";        //Positionierart setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#1u400\r";        //Startfrequenz setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)2 + "u" + FStart + "\r";        //Startfrequenz setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)3 + "u" + FStart + "\r";        //Startfrequenz setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)4 + "u" + FStart + "\r";        //Startfrequenz setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#1o" + FMax + "\r";        //Max-Frequenz setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                Daten = "#" + (char)2 + "o" + FMax + "\r";        //Max-Frequenz setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)3 + "o" + FMax + "\r";        //Max-Frequenz setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)4 + "o" + FMax + "\r";        //Max-Frequenz setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                //Daten = "#1b" + Rampe + "\r";        //Rampe setzen
+                //myport2.WriteLine(Daten);
+                Daten = "#" + (char)2 + "b" + Rampe + "\r";        //Rampe setzen
+                myport2.WriteLine(Daten);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)3 + "b" + Rampe + "\r";        //Rampe setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)4 + "b" + Rampe + "\r";        //Rampe setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#1d" + Rtg + "\r";        // Richtung setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)2 + "d" + Rtg + "\r";        // Richtung setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)3 + "d" + Rtg + "\r";        // Richtung setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)4 + "d" + Rtg + "\r";        // Richtung setzen
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#1A\r";        // starten
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)2 + "A" + "\r";        // starten
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)3 + "A" + "\r";        // starten
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Daten = "#" + (char)4 + "A" + "\r";        // starten
+                myport2.WriteLine(Daten);
+                Thread.Sleep(50);
+                auslesen = myport2.ReadExisting();
+                Thread.Sleep(100);
+                int pause = 0;
+                do
+                {
+                    pause += 1;
+                    if (St1 < 1)
+                    {
+                        Daten = "#1$\r";        // Status abfragen
+                        myport2.WriteLine(Daten);
+                        Thread.Sleep(100);
+                        auslesen = myport2.ReadExisting();
+                        Thread.Sleep(100);
+                        Thread.Sleep(100);
+                        if (auslesen.EndsWith("163\r") || auslesen.EndsWith("161\r"))
+                        {
+                            St1 = 1;
+                        }
+                    }
+                    if (St2 < 1)
+                    {
+                        Daten = "#" + (char)2 + "$" + "\r";        // Status abfragen
+                        myport2.WriteLine(Daten);
+                        Thread.Sleep(100);
+                        auslesen = myport2.ReadExisting();
+                        if (auslesen.EndsWith("\r") || auslesen.EndsWith("\r"))
+                        {
+                            St2 = 1;
+                        }
+                    }
+                    if (St3 < 1)
+                    {
+                        Daten = "#" + (char)3 + "$" + "\r";        // Status abfragen
+                        myport2.WriteLine(Daten);
+                        Thread.Sleep(100);
+                        auslesen = myport2.ReadExisting();
+                        //TbDaten.Text += auslesen;
+                        if (auslesen.EndsWith("\r") || auslesen.EndsWith("\r"))
+                        {
+                            St3 = 1;
+                        }
+                    }
+                    if (St4 < 1)
+                    {
+                        Daten = "#" + (char)4 + "$" + "\r";        // Status abfragen
+                        myport2.WriteLine(Daten);
+                        Thread.Sleep(50);
+                        auslesen = myport2.ReadExisting();
+                        //TbDaten.Text += auslesen;
+                        if (auslesen.EndsWith("\r") || auslesen.EndsWith("\r"))
+                        {
+                            St4 = 1;
+                        }
+                    }
+                    Status = St1 + St2 + St3 + St4;
+                }
+                while (Status < 4);
+                StartPunkt();
+                Referencefahrt_done = true;
+            }
+        }
+
+        // Zum Startpunkt fahren (nach Referenzfahrt)
+        private void StartPunkt()
+        {
+            // Daten für Normalbetrieb
+            myport2.ReadExisting();
+            string Daten = "#1p2\r";        //Positionierart setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(100);
+            myport2.ReadExisting();
+            Daten = "#" + (char)2 + "p2\r";        //Positionierart setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#" + (char)3 + "p2\r";         //Positionierart setzen
+            myport2.WriteLine(Daten);
+            myport2.ReadExisting();
+            Daten = "#" + (char)4 + "p2\r";        //Positionierart setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#1u400\r";        //Startfrequenz setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#" + (char)2 + "u700\r";        //Startfrequenz setzen
+            myport2.WriteLine(Daten);
+            myport2.ReadExisting();
+            Daten = "#" + (char)3 + "u700\r";        //Startfrequenz setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#" + (char)4 + "u700\r";          //Startfrequenz setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#1o3200\r";        //Max-Frequenz setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#" + (char)2 + "o3000\r";        //Max-Frequenz setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#" + (char)3 + "o3000\r";        //Max-Frequenz setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#" + (char)4 + "o3200\r";        //Max-Frequenz setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#1b10000\r";        //Rampe setzen 19115
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#" + (char)2 + "b13\r";        //Rampe setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#" + (char)3 + "b15\r";        //Rampe setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#" + (char)4 + "b14\r";        //Rampe setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#1s6000\r";        //Startposition setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#" + (char)2 + "s100\r";        //Startposition setzen
+            myport2.WriteLine(Daten);
+            myport2.ReadExisting();
+            Daten = "#" + (char)3 + "s4000\r";        //Startposition setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#" + (char)4 + "s8380\r";        //Startposition setzen
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Thread.Sleep(100);
+            myport2.ReadExisting();
+            Daten = "#1A\r";        // starten
+            myport2.WriteLine(Daten);
+            Thread.Sleep(100);
+            myport2.ReadExisting();
+            Daten = "#" + (char)2 + "A" + "\r";        // starten
+            myport2.WriteLine(Daten);
+            Thread.Sleep(50);
+            myport2.ReadExisting();
+            Daten = "#" + (char)3 + "A" + "\r";        // starten
+            myport2.WriteLine(Daten);
+            myport2.ReadExisting();
+            Thread.Sleep(50);
+            Daten = "#" + (char)4 + "A" + "\r";        // starten
+            myport2.WriteLine(Daten);
+            myport2.ReadExisting();
+        }
+
+        private void toolStripMenuItem15_Click(object sender, EventArgs e)
+        {
+            TextSpeichernOrDrucken.PerformClick();
         }
 
         // Speichern von Druck in Druckdatei oder Archiv oder beides
@@ -1354,8 +3167,10 @@ namespace Querdruck
                         FarbeEingabe.SelectedIndex = Int32.Parse(rdr["Farbe"].ToString()) - 1;
                     }
                     else { FarbeEingabe.SelectedIndex = -1; }
+                    AutoSuchen.Visible = true;
                 }
                 rdr.Close();
+                CheckLängsteZeile(LaengeZeile1);
             }
 
             catch (Exception e)
@@ -1510,6 +3325,7 @@ namespace Querdruck
         private void toolStripMenuItem14_Click(object sender, EventArgs e)
         {
             EmptyTheFields();
+            AutoSuchen.Visible = false;
         }
 
         // Änderungen speichern
@@ -1584,7 +3400,6 @@ namespace Querdruck
                     " where nr = " + Satz_Nr.Text + ";";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.ExecuteNonQuery();
-                MessageBox.Show("Änderungen wurden in " + AktuellDatei + " gespeichert");
             }
             catch
             {
@@ -1626,6 +3441,7 @@ namespace Querdruck
                     {
                         DruckLöschen("Druckdatei");
                     }
+                    AutoSuchen.Visible = false;
                 }
                 catch (Exception ex)
                 {
@@ -1650,7 +3466,6 @@ namespace Querdruck
                 string sql = "delete from " + AktuellDatei + " where nr = " + Satz_Nr.Text + ";";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.ExecuteNonQuery();
-                MessageBox.Show("den Druck wurde von " + AktuellDatei + " gelöscht");
                 EmptyTheFields();
             }
             catch
@@ -1707,6 +3522,39 @@ namespace Querdruck
             foreach (TextBox t in textBoxes)
             {
                 t.Enabled = false;
+            }
+
+            myport.WriteLine("I1"); //Platte prüfen
+            Thread.Sleep(50);
+            string platte = myport.ReadExisting();
+            Platte.Text = platte;
+
+        }
+
+        // Arduino- und Motorenports öffnen
+        private void OpenPorts()
+        {
+            try
+            {
+                myport = new SerialPort();
+                myport.BaudRate = 9600;
+                myport.PortName = "COM5";
+                myport.Open();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Error Arduino");
+            }
+            try
+            {
+                myport2 = new SerialPort();
+                myport2.BaudRate = 19200;
+                myport2.PortName = "COM6";
+                myport2.Open();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Error Motor");
             }
         }
 
@@ -1914,6 +3762,24 @@ namespace Querdruck
             {
                 return;
             }
+        }
+
+        private void toolStripMenuItem22_Click(object sender, EventArgs e)
+        {
+            if (!Bearbeiten_Mode)
+            {
+                TextSpeichernOrDrucken.PerformClick();
+            }
+        }
+
+        private void toolStripMenuItem24_Click(object sender, EventArgs e)
+        {
+            FensterWechseln.PerformClick();
+        }
+
+        private void toolStripMenuItem25_Click(object sender, EventArgs e)
+        {
+            ReferenzFahrt.PerformClick();
         }
 
         // zweite Seite bestimmen
@@ -2156,6 +4022,12 @@ namespace Querdruck
             {
                 if (Zeilen[i].Text == "") Hoehen[i].Text = "";
             }
+        }
+
+        private void PumpeAus_Click(object sender, EventArgs e)
+        {
+            Referencefahrt_done = true;
+            // myport.WriteLine("O30");
         }
     }
 }
