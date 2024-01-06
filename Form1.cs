@@ -19,7 +19,7 @@ namespace Querdruck
     public partial class Form1 : Form
     {
         public static bool Bearbeiten_Mode = true;
-        public static int letzte_Zeile = 0;
+        public static int letzte_Zeile = 1;
         public int Schriftgröße = -1, Tisch_init = 0;
         public int Seite2 = 0;
         public static string z1, z2, z3, z4, z5, z6, z7, z8, z9, z10, z11, z12, z13, z14, z15,
@@ -28,24 +28,39 @@ namespace Querdruck
                              stzNr, BdNr, brte, AVA, srft, frb, gedd, Dtm;
         Dictionary<TextBox, string> GoNull = new Dictionary<TextBox, string> { };
         Dictionary<TextBox, TextBox> Zeilen_Höhe = new Dictionary<TextBox, TextBox> { };
+        Dictionary<TextBox, TextBox> Zeilen_Sperren = new Dictionary<TextBox, TextBox> { };
+        Dictionary<TextBox, TextBox> Zeilen_Länge = new Dictionary<TextBox, TextBox> { };
+        Dictionary<TextBox, TextBox> Zeilen_Aus_Länge = new Dictionary<TextBox, TextBox> { };
         public string AktuellDruck;
         public string AktuellDatei = "Druckdatei";
         public static bool Referencefahrt_done = false;
+        public static bool weiter = true;
+        public static bool Druck_done = false;
+        public static bool USB_geht = false;
+        public static bool Nexter_Druck = false;
         List<char> SonderZeichen = new List<char> { 'Ä', 'Ü', 'Ö', ':', ';', 'é', 'è', 'á', 'à' };
         List<char> Abstände = new List<char> { ' ', '²', '³', '|', '@', 'µ' };
         List<TextBox> Zeilen = new List<TextBox> { };
+        List<TextBox> AlleZeilen = new List<TextBox> { };
         private SerialPort myport;
         private SerialPort myport2;
+        private TextBox Längste_Zeile;
+
+
+
+        /*************************************** Load, paaren, füllen, Modes und Ports ***************************************/
+
 
         public Form1()
         {
             InitializeComponent();
-            Paaren();
+            Paaren_Höhe();
             Zeilen_füllen();
+            AlleZeilen_füllen();
         }
 
         // Jede Zeile mit entsprechender Höhe verknüpfen
-        private void Paaren()
+        private void Paaren_Höhe()
         {
             Zeilen_Höhe.Add(Zeile1, Hoehe1);
             Zeilen_Höhe.Add(Zeile2, Hoehe2);
@@ -84,11 +99,37 @@ namespace Querdruck
             Zeilen.Add(Zeile15);
         }
 
+        // Alle-Zeilen-List füllen
+        private void AlleZeilen_füllen()
+        {
+            AlleZeilen.Add(Zeile1);
+            AlleZeilen.Add(Zeile2);
+            AlleZeilen.Add(Zeile3);
+            AlleZeilen.Add(Zeile4);
+            AlleZeilen.Add(Zeile5);
+            AlleZeilen.Add(Zeile6);
+            AlleZeilen.Add(Zeile7);
+            AlleZeilen.Add(Zeile8);
+            AlleZeilen.Add(Zeile9);
+            AlleZeilen.Add(Zeile10);
+            AlleZeilen.Add(Zeile11);
+            AlleZeilen.Add(Zeile12);
+            AlleZeilen.Add(Zeile13);
+            AlleZeilen.Add(Zeile14);
+            AlleZeilen.Add(Zeile15);
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             BearbeitenMode();
         }
-        
+
+
+
+        /*************************************** Events ***************************************/
+
+
+
         // Wenn man auf eine Zeile ist und auf Enter kliclt, dann fokusieren auf nächsten Zeile 
         private void Zeile1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -1656,7 +1697,7 @@ namespace Querdruck
         // "Länge" berechnen
         private void SchritGrößeÄndernFürLänge(TextBox Zeile, TextBox Laenge)
         {
-            
+
             if (Zeile.Text == "")
             {
                 Laenge.Text = "";
@@ -1723,7 +1764,7 @@ namespace Querdruck
             }
             conn.Close();
         }
-        
+
         // Die längste Zeile finden und mit Rot färben
         private void CheckLängsteZeile(TextBox Laenge)
         {
@@ -1937,14 +1978,14 @@ namespace Querdruck
                     return;
                 }
                 DruckMode();
-            } 
+            }
             else
             {
                 BearbeitenMode();
                 Bearbeiten_Mode = true;
                 ClosePorts();
             }
-            
+
         }
 
         private void ClosePorts()
@@ -2434,7 +2475,7 @@ namespace Querdruck
             return (X == "1");
         }
 
-        
+
 
         //Bandhalter prüfen
         private bool Bandhalter_prüfen()
@@ -2516,7 +2557,7 @@ namespace Querdruck
 
             // Motor 4
             if (TischPos != 0)
-            Motore_4_Drehen_Absolut((TischPos + Tisch_init).ToString());
+                Motore_4_Drehen_Absolut((TischPos + Tisch_init).ToString());
         }
 
         // Motor 3 Absolut Drehen
@@ -3873,6 +3914,7 @@ namespace Querdruck
             Seite2Waehlen();
         }
 
+        /* Seite 2 wählen */
         private void Seite2Waehlen()
         {
             List<TextBox> Hoehen = new List<TextBox>
@@ -3918,8 +3960,8 @@ namespace Querdruck
                 Zeile11, Zeile12, Zeile13, Zeile14, Zeile15
             };
             if (Seite2 == 0)
-            {   
-                for(int i = 15; i >= 1; i--)
+            {
+                for (int i = 15; i >= 1; i--)
                 {
                     if (Zeilen[i].Text == "") continue;
                     else
@@ -3941,7 +3983,7 @@ namespace Querdruck
                     if (Zeilen[i].Text == "") continue;
                     else { st1 += 1; }
                 }
-                if (st1 >= st2 && st1 != 0 && st2 !=0)
+                if (st1 >= st2 && st1 != 0 && st2 != 0)
                 {
                     for (int i = Seite2 - 1; i >= 1; i--)
                     {
@@ -3959,7 +4001,7 @@ namespace Querdruck
                     {
                         x += i;
                     }
-                    decimal ZH = Mitte - (x / st2) * AutomatZeilenAbstand.Value;                    
+                    decimal ZH = Mitte - (x / st2) * AutomatZeilenAbstand.Value;
                     for (int i = 15; i >= Seite2; i--)
                     {
                         if (Zeilen[i].Text == "") continue;
@@ -4002,7 +4044,7 @@ namespace Querdruck
             }
             HoehenLeeren();
         }
-        
+
         // Die Höhe der leeren Zeilen leeren wenn man auf Autom. Zeilenabstand kliclt
         private void HoehenLeeren()
         {
