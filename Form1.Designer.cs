@@ -1092,6 +1092,7 @@ namespace Querdruck
             this.Satz_Nr.ReadOnly = true;
             this.Satz_Nr.Size = new System.Drawing.Size(62, 22);
             this.Satz_Nr.TabIndex = 191;
+            this.Satz_Nr.TextChanged += new System.EventHandler(this.Satz_Nr_TextChanged);
             // 
             // FarbeEingabe
             // 
@@ -1937,6 +1938,7 @@ namespace Querdruck
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = " ";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.menuStrip1.ResumeLayout(false);
