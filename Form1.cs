@@ -2499,11 +2499,6 @@ namespace Querdruck
         }
 
 
-
-        /*  continue from here  */
-
-
-
         /*************************************** Drucksverfahrenfucnktionen ***************************************/
 
         // Async Drucken
@@ -2638,7 +2633,7 @@ namespace Querdruck
             try
             {
                 conn.Open();
-                string sql = "select TischPos from tabelle" + Schriftgröße + " where Zeichen = '" + x + "' COLLATE utf8mb4_bin";
+                string sql = "select TischPos from tabelle" + (Schriftgröße + 3) + " where Zeichen = '" + x + "' COLLATE utf8mb4_bin";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader rdr = cmd.ExecuteReader();
 
@@ -2668,13 +2663,17 @@ namespace Querdruck
         // Stempel ab (nach unten bewegen)
         private void Stempel_ab(char c)
         {
+            string strC;
+            if (c == '\\') { strC = "\\\\"; }
+            else if (c == '\'') { strC = "\\\'"; }
+            else { strC = c.ToString(); }
             int druck = 0;
             string connStr = "server=localhost;user=root;database=movedb;port=3306;password=6540";
             MySqlConnection conn = new MySqlConnection(connStr);
             try
             {
                 conn.Open();
-                string sql = "select Druck from Tabelle" + (Schriftgröße + 3) + " where Zeichen = '" + c + "' COLLATE utf8mb4_bin;";
+                string sql = "select Druck from Tabelle" + (Schriftgröße + 3) + " where Zeichen = '" + strC + "' COLLATE utf8mb4_bin;";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader rdr = cmd.ExecuteReader();
 
@@ -2692,9 +2691,8 @@ namespace Querdruck
             Double dk = druck * Decimal.ToDouble(Druckstärke.Value) / 550;
             druck = Convert.ToInt32(dk);
             myport.WriteLine("A" + druck.ToString()); // Schick PWM-signal von Arduino an Ventil 1
-            myport.WriteLine("O31"); // Pumpe einschalten
             myport.WriteLine("O11"); // Ventil ab (nach unten)
-            Thread.Sleep(1000);
+            Thread.Sleep((int)Druckzeit.Value * 20);
         }
 
         // Stempel auf (nach oben bewegen)
@@ -2706,7 +2704,6 @@ namespace Querdruck
             myport.WriteLine("O21"); // Ventil 2 einschalten (nach oben)
             Thread.Sleep(500);
             myport.WriteLine("O20"); // Ventil 2 ausschalten
-            myport.WriteLine("O30"); // Pumpe aus
         }
 
         // Richtige Platte prüfen
@@ -2720,6 +2717,7 @@ namespace Querdruck
         //Bandhalter prüfen
         private bool Bandhalter_prüfen()
         {
+            Thread.Sleep(50);
             myport.WriteLine("I3"); //Bandhalter prüfen
             Thread.Sleep(50);
             string halter = myport.ReadExisting();
@@ -2732,7 +2730,7 @@ namespace Querdruck
         {
             myport.WriteLine("I2");
             Thread.Sleep(50);
-            string X = myport.ReadExisting();
+            string X = myport.ReadExisting().Trim();
             return (X == "1");
         }
 
@@ -3069,6 +3067,7 @@ namespace Querdruck
 
         /*************************************** Apps-Operationsfucnktionen ***************************************/
 
+
         // Speichern von Druck in Druckdatei oder Archiv oder beides
         private void DruckSpeichern(string SaveIn)
         {
@@ -3108,6 +3107,7 @@ namespace Querdruck
             }
             conn.Close();
             UngedruckteZeilenBerechnen();
+            AktuellDatei = SaveIn;
         }
 
         // Die aktuellen Druck von Druckdatei oder Archiv löschen
@@ -3150,7 +3150,7 @@ namespace Querdruck
                 breite = (Breite.Text == "") ? -1 : BreiteToDatenBank(Int32.Parse(Breite.Text));
                 farbe = (FarbeEingabe.Text == "") ? -1 : FarbeEingabe.SelectedIndex + 1;
                 Satz_Nummer = (Satz_Nr.Text == "") ? Letzte_Satz_Nummer() : Satz_Nr.Text;
-                Ged = "\"" + CreateGedLangDruck(gedruckt, Satz_Nummer) + "\"";
+                Ged = "\"" + CreateGedQuerDruck(gedruckt, Satz_Nummer) + "\"";
                 schrift = (SchriftGröße.SelectedIndex + 1).ToString();
             }));
             Thread.Sleep(100);
@@ -3165,18 +3165,45 @@ namespace Querdruck
                     ", Zeile4 = " + GoNull[Zeile4] +
                     ", Zeile5 = " + GoNull[Zeile5] +
                     ", Zeile6 = " + GoNull[Zeile6] +
-                    ", Höhe1 = " + GoNull[HoeheZeile1] +
-                    ", Höhe2 = " + GoNull[HoeheZeile2] +
-                    ", Höhe3 = " + GoNull[HoeheZeile3] +
-                    ", Höhe4 = " + GoNull[HoeheZeile4] +
-                    ", Höhe5 = " + GoNull[HoeheZeile5] +
-                    ", Höhe6 = " + GoNull[HoeheZeile6] +
+                    ", Zeile7 = " + GoNull[Zeile7] +
+                    ", Zeile8 = " + GoNull[Zeile8] +
+                    ", Zeile9 = " + GoNull[Zeile9] +
+                    ", Zeile10 = " + GoNull[Zeile10] +
+                    ", Zeile11 = " + GoNull[Zeile11] +
+                    ", Zeile12 = " + GoNull[Zeile12] +
+                    ", Zeile13 = " + GoNull[Zeile13] +
+                    ", Zeile14 = " + GoNull[Zeile14] +
+                    ", Zeile15 = " + GoNull[Zeile15] +
+                    ", Höhe1 = " + GoNull[Hoehe1] +
+                    ", Höhe2 = " + GoNull[Hoehe2] +
+                    ", Höhe3 = " + GoNull[Hoehe3] +
+                    ", Höhe4 = " + GoNull[Hoehe4] +
+                    ", Höhe5 = " + GoNull[Hoehe5] +
+                    ", Höhe6 = " + GoNull[Hoehe6] +
+                    ", Höhe7 = " + GoNull[Hoehe7] +
+                    ", Höhe8 = " + GoNull[Hoehe8] +
+                    ", Höhe9 = " + GoNull[Hoehe9] +
+                    ", Höhe10 = " + GoNull[Hoehe10] +
+                    ", Höhe11 = " + GoNull[Hoehe11] +
+                    ", Höhe12 = " + GoNull[Hoehe12] +
+                    ", Höhe13 = " + GoNull[Hoehe13] +
+                    ", Höhe14 = " + GoNull[Hoehe14] +
+                    ", Höhe15 = " + GoNull[Hoehe15] +
                     ", Sperren1 = " + GoNull[Sperren1] +
                     ", Sperren2 = " + GoNull[Sperren2] +
                     ", Sperren3 = " + GoNull[Sperren3] +
                     ", Sperren4 = " + GoNull[Sperren4] +
                     ", Sperren5 = " + GoNull[Sperren5] +
                     ", Sperren6 = " + GoNull[Sperren6] +
+                    ", Sperren7 = " + GoNull[Sperren7] +
+                    ", Sperren8 = " + GoNull[Sperren8] +
+                    ", Sperren9 = " + GoNull[Sperren9] +
+                    ", Sperren10 = " + GoNull[Sperren10] +
+                    ", Sperren11 = " + GoNull[Sperren11] +
+                    ", Sperren12 = " + GoNull[Sperren12] +
+                    ", Sperren13 = " + GoNull[Sperren13] +
+                    ", Sperren14 = " + GoNull[Sperren14] +
+                    ", Sperren15 = " + GoNull[Sperren15] +
                     ", BandNr = " + GoNull[BandNr] +
                     ", schrift = " + schrift +
                     ", Datum = " + Datum +
@@ -3201,7 +3228,7 @@ namespace Querdruck
         }
 
         // Änderungen speichern
-        private void DruckÄndern(string AktuellDatei)
+        private void DruckÄndern(string AktuellDatei, TextBox gedruckt = null)
         {
             if (CheckEveryZeileHasHöhe() == false) { return; }
             CreateNullForDatenbank();
@@ -3210,7 +3237,8 @@ namespace Querdruck
             string Datum = "\"" + dt1.ToString() + "\"";
             int breite = (Breite.Text == "") ? -1 : BreiteToDatenBank(Int32.Parse(Breite.Text));
             int farbe = (FarbeEingabe.Text == "") ? -1 : FarbeEingabe.SelectedIndex + 1;
-            string Ged = "\"" + CreateGedQuerDruck() + "\"";
+            string Satz_Nummer = (Satz_Nr.Text == "") ? Letzte_Satz_Nummer() : Satz_Nr.Text;
+            string Ged = "\"" + CreateGedQuerDruck(gedruckt, Satz_Nummer) + "\"";
             string schrift = (SchriftGröße.SelectedIndex + 1).ToString();
             string connStr = "server=localhost;user=root;database=movedb;port=3306;password=6540";
             MySqlConnection conn = new MySqlConnection(connStr);
@@ -3269,7 +3297,7 @@ namespace Querdruck
                     ", Farbe = " + farbe +
                     ", BandBr = " + breite +
                     ", AbstvU = " + AbstandVonAussen.Value +
-                    " where nr = " + Satz_Nr.Text + ";";
+                    " where nr = " + Satz_Nummer + ";";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 cmd.ExecuteNonQuery();
             }
@@ -3278,18 +3306,26 @@ namespace Querdruck
                 MessageBox.Show("Kein Druck zum Ändern!");
             }
             conn.Close();
+            UngedruckteZeilenBerechnen();
         }
 
+
+
+
+        /* Ab hier*/
+
+
+
         // Den Druck aufrufen
-        private void DruckAufrufen(string SelectDruck)
+        private void DruckAufrufen(string SelectDruck, string auto = " and Ged like \"Q%\"")
         {
             string connStr = "server=localhost;user=root;database=movedb;port=3306;password=6540";
             MySqlConnection conn = new MySqlConnection(connStr);
-
+            string Ged;
             try
             {
                 conn.Open();
-                string sql = "select * from " + AktuellDatei + " where nr = " + SelectDruck;
+                string sql = "select * from " + AktuellDatei + " where nr = " + SelectDruck + auto;
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader rdr = cmd.ExecuteReader();
                 while (rdr.Read())
