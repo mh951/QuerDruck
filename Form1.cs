@@ -22,6 +22,7 @@ namespace Querdruck
         public static int letzte_Zeile = 1;
         public int Schriftgröße = -1, Tisch_init = 0;
         public int Seite2 = 0;
+        public int Band_Breite = 75;
         public static string z1, z2, z3, z4, z5, z6, z7, z8, z9, z10, z11, z12, z13, z14, z15,
                              h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h15,
                              s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15,
@@ -2549,18 +2550,13 @@ namespace Querdruck
             {
                 return;
             }
-            if (Breite.SelectedIndex == -1)
-            {
-                MessageBox.Show("Bitte die Bandbreite wählen!");
-                return;
-            }
+            float Mitte = (float)Band_Breite / 2;
             myport.WriteLine("O31"); // Pumpe einschalten
             foreach (TextBox Zeile in Zeilen)
             {
                 if (string.IsNullOrEmpty(Zeile.Text)) continue;
                 string Zum_Drucken = Zeile.Text.Trim();
                 int Sprr = (!string.IsNullOrEmpty(Zeilen_Sperren[Zeile].Text)) ? Int32.Parse(Zeilen_Sperren[Zeile].Text) : 0;
-                float Mitte = float.Parse(Breite.Text) / 2;
                 int ABStVA = (int)((Mitte + float.Parse(Zeilen_Länge[Zeile].Text) / 2) * 40);
                 int M4 = 0;
                 int AnzahlVonABSt = 0;
@@ -2571,7 +2567,6 @@ namespace Querdruck
                     {
                         if (x == Zum_Drucken.Length)
                         {
-                            //Ab Hier
                             if (SonderZeichen.Contains(Zum_Drucken[x - 1]))
                             {
                                 //SonderZeichen_Drucken(Zeile, Zum_Drucken[x - 1], "0", "20", ABStVA.ToString());
@@ -2638,7 +2633,7 @@ namespace Querdruck
                                 return;
                             };
                         }
-                        //Stempel_ab(Zum_Drucken[x - 1]);
+                        Stempel_ab(Zum_Drucken[x - 1]);
                         Stempel_auf();
                         bool Stmp = true;
                         while (Stmp)
@@ -2653,29 +2648,29 @@ namespace Querdruck
                     {
                         MessageBox.Show(ex.ToString());
                     }
-                    Motore_5_Drehen_Relativ("20");
-                    if (Satz_Nr.Text != "") { DruckÄndern_Neu("Druckdatei", Zeile); }
-                    this.BeginInvoke(new MethodInvoker(() =>
-                    {
-                        UngedruckteZeilenBerechnen();
-                    }));
                 }
-                StartPunkt();
-                myport.WriteLine("O30"); // Pumpe aus
-
+                Motore_5_Drehen_Relativ("20");
+                if (Satz_Nr.Text != "") { DruckÄndern_Neu("Druckdatei", Zeile); }
                 this.BeginInvoke(new MethodInvoker(() =>
                 {
-                    TextSpeichernOrDrucken.Enabled = true;
-                    AutoSuchen.Enabled = true;
-                    FensterWechseln.Enabled = true;
-                    ReferenzFahrt.Enabled = true;
-                    SchriftWechseln.Enabled = true;
-                    panel8.Enabled = true;
+                    UngedruckteZeilenBerechnen();
                 }));
-
-                this.ActiveControl = null;
-                Druck_done = true;
             }
+            StartPunkt();
+            myport.WriteLine("O30"); // Pumpe aus
+
+            this.BeginInvoke(new MethodInvoker(() =>
+            {
+                TextSpeichernOrDrucken.Enabled = true;
+                AutoSuchen.Enabled = true;
+                FensterWechseln.Enabled = true;
+                ReferenzFahrt.Enabled = true;
+                SchriftWechseln.Enabled = true;
+                panel8.Enabled = true;
+            }));
+
+            this.ActiveControl = null;
+            Druck_done = true;
         }
 
         // Die Sonderzeichen Drucken
@@ -4440,6 +4435,16 @@ namespace Querdruck
                 {
                     return;
                 }
+                if (Breite.SelectedIndex == -1)
+                {
+                    MessageBox.Show("Bitte die Bandbreite wählen!");
+                    return;
+                }
+                if (AbstandVonAussen.Value < 42) {
+                    MessageBox.Show("Der Abstand von außen ist ungültig!");
+                    return;
+                }
+                Band_Breite = Int32.Parse(Breite.Text);
                 Zeilen.Clear();
                 if(Seite2 == 0) { Zeilen.AddRange(AlleZeilen); }
                 else { Zeilen.AddRange(Zeilen_Seite_1); }
@@ -4856,17 +4861,13 @@ namespace Querdruck
 
         private void StopButton_Click(object sender, EventArgs e)
         {
-
+            weiter = false;
         }
 
         private void PumpeAus_Click(object sender, EventArgs e)
         {
             //Referencefahrt_done = true;
-            // myport.WriteLine("O30");
-            string zzz = "3,5";
-            float xxx = float.Parse(zzz);
-         //   float yyy = xxx / 2;
-            MessageBox.Show(((int)xxx).ToString());
+             myport.WriteLine("O30");
         }
     }
 }
