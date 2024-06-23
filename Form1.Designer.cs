@@ -178,6 +178,7 @@ namespace Querdruck
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.panel8 = new System.Windows.Forms.Panel();
+            this.teildruckToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Druckzeit)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Druckstärke)).BeginInit();
@@ -222,6 +223,7 @@ namespace Querdruck
             this.toolStripMenuItem9.Name = "toolStripMenuItem9";
             this.toolStripMenuItem9.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem9.Text = "Programm beenden";
+            this.toolStripMenuItem9.Click += new System.EventHandler(this.toolStripMenuItem9_Click);
             // 
             // toolStripMenuItem2
             // 
@@ -349,7 +351,8 @@ namespace Querdruck
             this.toolStripMenuItem24,
             this.referenzfahrtToolStripMenuItem,
             this.schriftplattWechselnToolStripMenuItem,
-            this.dauersuchenToolStripMenuItem});
+            this.dauersuchenToolStripMenuItem,
+            this.teildruckToolStripMenuItem});
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
             this.toolStripMenuItem4.Size = new System.Drawing.Size(57, 20);
             this.toolStripMenuItem4.Text = "Fenster";
@@ -391,6 +394,7 @@ namespace Querdruck
             this.schriftplattWechselnToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
             this.schriftplattWechselnToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.schriftplattWechselnToolStripMenuItem.Text = "Schriftplatte wechseln";
+            this.schriftplattWechselnToolStripMenuItem.Click += new System.EventHandler(this.schriftplattWechselnToolStripMenuItem_Click);
             // 
             // dauersuchenToolStripMenuItem
             // 
@@ -564,6 +568,7 @@ namespace Querdruck
             this.StopButton.TabIndex = 112;
             this.StopButton.Text = "Stop";
             this.StopButton.UseVisualStyleBackColor = true;
+            this.StopButton.Click += new System.EventHandler(this.StopButton_Click);
             // 
             // InfoZeile
             // 
@@ -1092,7 +1097,6 @@ namespace Querdruck
             this.Satz_Nr.ReadOnly = true;
             this.Satz_Nr.Size = new System.Drawing.Size(62, 22);
             this.Satz_Nr.TabIndex = 191;
-            this.Satz_Nr.TextChanged += new System.EventHandler(this.Satz_Nr_TextChanged);
             // 
             // FarbeEingabe
             // 
@@ -1917,6 +1921,14 @@ namespace Querdruck
             this.panel8.Size = new System.Drawing.Size(165, 83);
             this.panel8.TabIndex = 117;
             // 
+            // teildruckToolStripMenuItem
+            // 
+            this.teildruckToolStripMenuItem.Name = "teildruckToolStripMenuItem";
+            this.teildruckToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F11;
+            this.teildruckToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+            this.teildruckToolStripMenuItem.Text = "Teildruck";
+            this.teildruckToolStripMenuItem.Click += new System.EventHandler(this.teildruckToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2108,6 +2120,7 @@ namespace Querdruck
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel panel8;
+        private System.Windows.Forms.ToolStripMenuItem teildruckToolStripMenuItem;
     }
 }
 

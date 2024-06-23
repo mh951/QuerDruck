@@ -227,7 +227,7 @@ namespace Querdruck
             referenzfahrtToolStripMenuItem.Enabled = true;
             schriftplattWechselnToolStripMenuItem.Enabled = true;
             dauersuchenToolStripMenuItem.Enabled = true;
-            //teildruckToolStripMenuItem.Enabled = false;
+            teildruckToolStripMenuItem.Enabled = false;
             //seite2ToolStripMenuItem.Enabled = true;
             druckSpeichernToolStripMenuItem.Enabled = false;
             druckToolStripMenuItem.Enabled = false;
@@ -2483,6 +2483,10 @@ namespace Querdruck
             {
                 dauersuchenToolStripMenuItem.PerformClick();
             }
+            if (e.KeyCode == Keys.F12)
+            {
+                teildruckToolStripMenuItem.PerformClick();
+            }
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -2546,11 +2550,7 @@ namespace Querdruck
                 MessageBox.Show("Bitte Höhe wählen!");
                 return;
             }
-            if (!Check_Zeilen_Länge())
-            {
-                return;
-            }
-            float Mitte = (float)Band_Breite / 2;
+            float Mitte = ((float)Band_Breite / 2) - 5;
             myport.WriteLine("O31"); // Pumpe einschalten
             foreach (TextBox Zeile in Zeilen)
             {
@@ -2569,7 +2569,7 @@ namespace Querdruck
                         {
                             if (SonderZeichen.Contains(Zum_Drucken[x - 1]))
                             {
-                                //SonderZeichen_Drucken(Zeile, Zum_Drucken[x - 1], "0", "20", ABStVA.ToString());
+                                SonderZeichen_Drucken(Zeile, Zum_Drucken[x - 1], "0", "20", ABStVA.ToString());
                                 continue;
                             }
                             else if (Abstände.Contains(Zum_Drucken[x - 1]))
@@ -2674,9 +2674,78 @@ namespace Querdruck
         }
 
         // Die Sonderzeichen Drucken
-        private void SonderZeichen_Drucken(TextBox Zeile, char v, string M3 = "0", string M5 = "0", string abst = "0")
+        private void SonderZeichen_Drucken(TextBox Zeile, char v, string M4 = "0", string M5 = "0", string abst = "0")
         {
+            char b = ' ';
+            char Sonder = ' ';
 
+            if (v == 'Ä')
+            {
+                b = 'A';
+                Sonder = '*';
+            }
+            else if (v == 'Ö')
+            {
+                b = 'O';
+                Sonder = '*';
+            }
+            else if (v == 'Ü')
+            {
+                b = 'U';
+                Sonder = '*';
+            }
+            else if (v == ':')
+            {
+                b = '.';
+                Sonder = '.';
+            }
+            else if (v == ';')
+            {
+                b = ',';
+                Sonder = '.';
+            }
+            else if (v == 'é')
+            {
+                b = 'e';
+                Sonder = '´';
+            }
+            else if (v == 'è')
+            {
+                b = 'e';
+                Sonder = '`';
+            }
+            else if (v == 'á')
+            {
+                b = 'a';
+                Sonder = '´';
+            }
+            else if (v == 'à')
+            {
+                b = 'a';
+                Sonder = '`';
+            }
+            int höhe = (Int32.Parse(Zeilen_Höhe[Zeile].Text) * 40);
+            Motoren_1A_2A_3R_4A_5R(höhe, b.ToString(), M4, M5, "1", Int32.Parse(abst));
+            Motoren_stehen();
+            Stempel_ab(b);
+            Stempel_auf();
+            bool Stmp = true;
+            while (Stmp)
+            {
+                Stmp = !Stempel_prüfen();
+            }
+            Trennung();
+            string sdr = Tisch_Pos_bringen(v.ToString());
+            Motoren_1A_2A_3R_4A_5R(höhe, Sonder.ToString(), "0", M5, sdr);
+            Motoren_stehen();
+            Stempel_ab(Sonder);
+            Stempel_auf();
+            Stmp = true;
+            while (Stmp)
+            {
+                Stmp = !Stempel_prüfen();
+            }
+            Trennung();
         }
 
         // Tisch Position aus Datenbank aufrunfen
@@ -3903,14 +3972,12 @@ namespace Querdruck
             return true;
         }
 
-        // TODO: wie ist die Höchstlänge?
-        // kontroliere ob alle Zeilen kurzer als 71 cm
         private bool Check_Zeilen_Länge()
         {
             foreach (TextBox t in AlleZeilen)
             {
                 if (Zeilen_Länge[t].Text == "") continue;
-                if (Convert.ToDouble(Zeilen_Länge[t].Text) >= 710)
+                if (Convert.ToDouble(Zeilen_Länge[t].Text) >= Convert.ToDouble(Breite.Text))
                 {
                     MessageBox.Show("Text wird zu lang!");
                     return false;
@@ -4431,10 +4498,6 @@ namespace Querdruck
                     MessageBox.Show("Bitte Höhe wählen!");
                     return;
                 }
-                if (!Check_Zeilen_Länge())
-                {
-                    return;
-                }
                 if (Breite.SelectedIndex == -1)
                 {
                     MessageBox.Show("Bitte die Bandbreite wählen!");
@@ -4765,6 +4828,11 @@ namespace Querdruck
             ReferenzFahrt.PerformClick();
         }
 
+        private void teildruckToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("hi");
+        }
+
         private void toolStripMenuItem9_Click(object sender, EventArgs e)
         {
             Application.Exit();
@@ -4867,7 +4935,7 @@ namespace Querdruck
         private void PumpeAus_Click(object sender, EventArgs e)
         {
             //Referencefahrt_done = true;
-             myport.WriteLine("O30");
+            //myport.WriteLine("O30");
         }
     }
 }
