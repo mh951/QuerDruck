@@ -11,6 +11,7 @@ using MySql.Data;
 using MySql.Data.MySqlClient;
 using System.IO.Ports;
 using System.Threading;
+using System.Windows.Shapes;
 
 
 
@@ -227,7 +228,7 @@ namespace Querdruck
             referenzfahrtToolStripMenuItem.Enabled = true;
             schriftplattWechselnToolStripMenuItem.Enabled = true;
             dauersuchenToolStripMenuItem.Enabled = true;
-            teildruckToolStripMenuItem.Enabled = false;
+            //teildruckToolStripMenuItem.Enabled = false;
             //seite2ToolStripMenuItem.Enabled = true;
             druckSpeichernToolStripMenuItem.Enabled = false;
             druckToolStripMenuItem.Enabled = false;
@@ -2483,10 +2484,6 @@ namespace Querdruck
             {
                 dauersuchenToolStripMenuItem.PerformClick();
             }
-            if (e.KeyCode == Keys.F12)
-            {
-                teildruckToolStripMenuItem.PerformClick();
-            }
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -2496,8 +2493,6 @@ namespace Querdruck
 
 
         /*************************************** Drucksverfahrenfucnktionen ***************************************/
-
-        /* Ab Hier*/
 
         // Async Drucken
         private async Task LongRunningOperationAsync()
@@ -2550,14 +2545,16 @@ namespace Querdruck
                 MessageBox.Show("Bitte Höhe wählen!");
                 return;
             }
-            float Mitte = ((float)Band_Breite / 2) - 5;
+            float Mitte = 75;
             myport.WriteLine("O31"); // Pumpe einschalten
             foreach (TextBox Zeile in Zeilen)
             {
                 if (string.IsNullOrEmpty(Zeile.Text)) continue;
                 string Zum_Drucken = Zeile.Text.Trim();
                 int Sprr = (!string.IsNullOrEmpty(Zeilen_Sperren[Zeile].Text)) ? Int32.Parse(Zeilen_Sperren[Zeile].Text) : 0;
-                int ABStVA = (int)((Mitte + float.Parse(Zeilen_Länge[Zeile].Text) / 2) * 40);
+                float breite_letztes_Buchstabe = Zeichen_Breite(Zum_Drucken[Zum_Drucken.Length - 1]) / 20;
+                int ABStVO = (Zum_Drucken.Length != 1) ? (int)((Mitte - breite_letztes_Buchstabe + float.Parse(Zeilen_Länge[Zeile].Text) / 2) * 40) :
+                        (int)(Mitte * 40);
                 int M4 = 0;
                 int AnzahlVonABSt = 0;
                 for (int x = Zum_Drucken.Length; x > 0; x--)
@@ -2569,7 +2566,7 @@ namespace Querdruck
                         {
                             if (SonderZeichen.Contains(Zum_Drucken[x - 1]))
                             {
-                                SonderZeichen_Drucken(Zeile, Zum_Drucken[x - 1], "0", "20", ABStVA.ToString());
+                                SonderZeichen_Drucken(Zeile, Zum_Drucken[x - 1], "0", "20", ABStVO.ToString());
                                 continue;
                             }
                             else if (Abstände.Contains(Zum_Drucken[x - 1]))
@@ -2577,7 +2574,7 @@ namespace Querdruck
                                 continue;
                             }
                             int höhe = (Int32.Parse(Zeilen_Höhe[Zeile].Text) - 32) * 40;
-                            Motoren_1A_2A_3R_4A_5R(höhe, Zum_Drucken[x - 1].ToString(), M4.ToString(), "20", "1", ABStVA);
+                            Motoren_1A_2A_3R_4A_5R(höhe, Zum_Drucken[x - 1].ToString(), M4.ToString(), "20", "1", ABStVO);
                         }
                         else
                         {
@@ -2602,7 +2599,7 @@ namespace Querdruck
 
                             if (SonderZeichen.Contains(Zum_Drucken[x - 1]))
                             {
-                            //    SonderZeichen_Drucken(Zeile, Zum_Drucken[x - 1], M4.ToString(), M5.ToString());
+                                SonderZeichen_Drucken(Zeile, Zum_Drucken[x - 1], M4.ToString(), M5.ToString());
                                 M4 = 0;
                                 AnzahlVonABSt = 0;
                                 continue;
@@ -2724,7 +2721,7 @@ namespace Querdruck
                 b = 'a';
                 Sonder = '`';
             }
-            int höhe = (Int32.Parse(Zeilen_Höhe[Zeile].Text) * 40);
+            int höhe = ((Int32.Parse(Zeilen_Höhe[Zeile].Text) -32 )* 40);
             Motoren_1A_2A_3R_4A_5R(höhe, b.ToString(), M4, M5, "1", Int32.Parse(abst));
             Motoren_stehen();
             Stempel_ab(b);
@@ -2828,6 +2825,22 @@ namespace Querdruck
             myport.WriteLine("O21"); // Ventil 2 einschalten (nach oben)
             Thread.Sleep(500);
             myport.WriteLine("O20"); // Ventil 2 ausschalten
+        }
+
+        private void automSuchenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string Farbe = "";
+            if (GoldButton.Checked) Farbe = "1";
+            else if (SchwarzButton.Checked) Farbe = "2";
+            else if (WeißButton.Checked) { Farbe = "3"; }
+
+            string Add_Farbe = " and Farbe = " + Farbe;
+            if (AlleButton.Checked) Add_Farbe = "";
+            AktuellDatei = "druckdatei";
+            SchriftGröße.SelectedIndex = Int32.Parse(Platte.Text) - 4;
+            DruckAufrufen("(select max(nr) from druckdatei where Ged Like \"%Q" +
+                (SchriftGröße.SelectedIndex + 1).ToString() + "%\"" + Add_Farbe + ")");
+            AktuellDruck = Satz_Nr.Text;
         }
 
         // Richtige Platte prüfen
@@ -3027,7 +3040,7 @@ namespace Querdruck
             Thread.Sleep(50);
         }
 
-        // Motor 5 Relativ Drehen
+
         private void Motore_5_Drehen_Relativ(string x)
         {
             // Motor 5
@@ -3466,7 +3479,7 @@ namespace Querdruck
         }
 
         // Den Druck aufrufen
-        private void DruckAufrufen(string SelectDruck, string auto = " and Ged like \"Q%\"")
+        private void DruckAufrufen(string SelectDruck)
         {
             string connStr = "server=localhost;user=root;database=movedb;port=3306;password=6540";
             MySqlConnection conn = new MySqlConnection(connStr);
@@ -3474,7 +3487,7 @@ namespace Querdruck
             try
             {
                 conn.Open();
-                string sql = "select * from " + AktuellDatei + " where nr = " + SelectDruck + auto;
+                string sql = "select * from " + AktuellDatei + " where nr = " + SelectDruck ;
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader rdr = cmd.ExecuteReader();
                 while (rdr.Read())
@@ -3544,6 +3557,7 @@ namespace Querdruck
                 }
                 rdr.Close();
                 CheckLängsteZeile(LaengeZeile1);
+                Seite2Erkennen();
             }
 
             catch (Exception e)
@@ -3932,6 +3946,28 @@ namespace Querdruck
             }
         }
 
+        /* Seite 2 erkennen, nach dem Druckaufruf */
+        private void Seite2Erkennen()
+        {
+            bool Seite1done = false;
+            foreach (TextBox t in AlleZeilen)
+            {
+                if (t.Text == "")
+                {
+                    Seite1done = true;
+                    continue;
+                }
+                if (Seite1done)
+                {
+                    Seite2 = Nummer_Zeilen.FirstOrDefault(x => x.Value == t).Key;
+                    Seite2Waehlen();
+                    return;
+                }
+            }
+            Seite2 = 0;
+            Seite2Waehlen();
+            return;
+        }
 
         /*************************************** Checken ***************************************/
 
@@ -3974,6 +4010,11 @@ namespace Querdruck
 
         private bool Check_Zeilen_Länge()
         {
+            if (Breite.SelectedIndex == -1)
+            {
+                MessageBox.Show("Bitte die Bandbreite eingeben!");
+                return false;
+            }
             foreach (TextBox t in AlleZeilen)
             {
                 if (Zeilen_Länge[t].Text == "") continue;
@@ -4221,10 +4262,7 @@ namespace Querdruck
             }
             else
             {
-                SchriftGröße.SelectedIndex = Int32.Parse(Platte.Text) - 1;
-                DruckAufrufen("(select max(nr) from druckdatei where Ged Like \"%Q" +   // TODO: korrigiere dies in Längsdruck
-                    (SchriftGröße.SelectedIndex + 1).ToString() + "%\")");
-                AktuellDruck = Satz_Nr.Text;
+                automSuchenToolStripMenuItem.PerformClick();
             }
         }
 
@@ -4542,7 +4580,7 @@ namespace Querdruck
         private void ToolStripMenuItem13_Click(object sender, EventArgs e)
         {
             AktuellDatei = "Druckdatei";
-            DruckAufrufen("(select max(nr) from druckdatei)");
+            DruckAufrufen("(select max(nr) from druckdatei where Ged like \"Q%\")");
             AktuellDruck = Satz_Nr.Text;
             label3.Text = AktuellDatei;
         }
@@ -4565,7 +4603,7 @@ namespace Querdruck
             {
                 try
                 {
-                    DruckAufrufen("(select max(nr) from " + AktuellDatei + " where nr < " + AktuellDruck + ")");
+                    DruckAufrufen("(select max(nr) from " + AktuellDatei + " where nr < " + AktuellDruck + " and Ged like \"Q%\")");
                     AktuellDruck = Satz_Nr.Text;
                 }
                 catch { return; }
@@ -4576,14 +4614,14 @@ namespace Querdruck
         {
             if (string.IsNullOrEmpty(AktuellDruck))
             {
-                DruckAufrufen("(select min(nr) from druckdatei)");
+                DruckAufrufen("(select min(nr) from druckdatei where Ged like \"Q%\")");
                 AktuellDruck = Satz_Nr.Text;
             }
             else
             {
                 try
                 {
-                    DruckAufrufen("(select min(nr) from " + AktuellDatei + " where nr > " + AktuellDruck + ")");
+                    DruckAufrufen("(select min(nr) from " + AktuellDatei + " where nr > " + AktuellDruck + " and Ged like \"Q%\")");
                     AktuellDruck = Satz_Nr.Text;
                 }
                 catch { return; }
@@ -4828,11 +4866,6 @@ namespace Querdruck
             ReferenzFahrt.PerformClick();
         }
 
-        private void teildruckToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("hi");
-        }
-
         private void toolStripMenuItem9_Click(object sender, EventArgs e)
         {
             Application.Exit();
@@ -4935,7 +4968,7 @@ namespace Querdruck
         private void PumpeAus_Click(object sender, EventArgs e)
         {
             //Referencefahrt_done = true;
-            //myport.WriteLine("O30");
+            myport.WriteLine("O30");
         }
     }
 }

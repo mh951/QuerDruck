@@ -178,7 +178,6 @@ namespace Querdruck
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.panel8 = new System.Windows.Forms.Panel();
-            this.teildruckToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Druckzeit)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Druckstärke)).BeginInit();
@@ -244,7 +243,7 @@ namespace Querdruck
             // 
             this.toolStripMenuItem10.Name = "toolStripMenuItem10";
             this.toolStripMenuItem10.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F6)));
-            this.toolStripMenuItem10.Size = new System.Drawing.Size(230, 22);
+            this.toolStripMenuItem10.Size = new System.Drawing.Size(232, 22);
             this.toolStripMenuItem10.Text = "Archiv suchen";
             this.toolStripMenuItem10.Click += new System.EventHandler(this.toolStripMenuItem10_Click);
             // 
@@ -252,7 +251,7 @@ namespace Querdruck
             // 
             this.toolStripMenuItem11.Name = "toolStripMenuItem11";
             this.toolStripMenuItem11.ShortcutKeys = System.Windows.Forms.Keys.F6;
-            this.toolStripMenuItem11.Size = new System.Drawing.Size(230, 22);
+            this.toolStripMenuItem11.Size = new System.Drawing.Size(232, 22);
             this.toolStripMenuItem11.Text = "Druck suchen";
             this.toolStripMenuItem11.Click += new System.EventHandler(this.toolStripMenuItem11_Click);
             // 
@@ -260,7 +259,7 @@ namespace Querdruck
             // 
             this.toolStripMenuItem12.Name = "toolStripMenuItem12";
             this.toolStripMenuItem12.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F7)));
-            this.toolStripMenuItem12.Size = new System.Drawing.Size(230, 22);
+            this.toolStripMenuItem12.Size = new System.Drawing.Size(232, 22);
             this.toolStripMenuItem12.Text = "letzter Druck Aruchiv";
             this.toolStripMenuItem12.Click += new System.EventHandler(this.ToolStripMenuItem12_Click);
             // 
@@ -268,7 +267,7 @@ namespace Querdruck
             // 
             this.toolStripMenuItem13.Name = "toolStripMenuItem13";
             this.toolStripMenuItem13.ShortcutKeys = System.Windows.Forms.Keys.F7;
-            this.toolStripMenuItem13.Size = new System.Drawing.Size(230, 22);
+            this.toolStripMenuItem13.Size = new System.Drawing.Size(232, 22);
             this.toolStripMenuItem13.Text = "letzter Druck";
             this.toolStripMenuItem13.Click += new System.EventHandler(this.ToolStripMenuItem13_Click);
             // 
@@ -276,7 +275,7 @@ namespace Querdruck
             // 
             this.druckNeuToolStripMenuItem.Name = "druckNeuToolStripMenuItem";
             this.druckNeuToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F8;
-            this.druckNeuToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.druckNeuToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this.druckNeuToolStripMenuItem.Text = "Druck neu";
             this.druckNeuToolStripMenuItem.Click += new System.EventHandler(this.toolStripMenuItem14_Click);
             // 
@@ -284,14 +283,14 @@ namespace Querdruck
             // 
             this.druckSpeichernToolStripMenuItem.Name = "druckSpeichernToolStripMenuItem";
             this.druckSpeichernToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.druckSpeichernToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.druckSpeichernToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this.druckSpeichernToolStripMenuItem.Text = "Druck speichern";
             this.druckSpeichernToolStripMenuItem.Click += new System.EventHandler(this.toolStripMenuItem15_Click);
             // 
             // druckToolStripMenuItem
             // 
             this.druckToolStripMenuItem.Name = "druckToolStripMenuItem";
-            this.druckToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.druckToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this.druckToolStripMenuItem.Text = "Druck ändern";
             this.druckToolStripMenuItem.Click += new System.EventHandler(this.toolStripMenuItem16_Click);
             // 
@@ -299,7 +298,7 @@ namespace Querdruck
             // 
             this.druckLöschenToolStripMenuItem.Name = "druckLöschenToolStripMenuItem";
             this.druckLöschenToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
-            this.druckLöschenToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.druckLöschenToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
             this.druckLöschenToolStripMenuItem.Text = "Druck löschen";
             this.druckLöschenToolStripMenuItem.Click += new System.EventHandler(this.toolStripMenuItem17_Click);
             // 
@@ -318,21 +317,21 @@ namespace Querdruck
             // 
             this.toolStripMenuItem18.Name = "toolStripMenuItem18";
             this.toolStripMenuItem18.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F1)));
-            this.toolStripMenuItem18.Size = new System.Drawing.Size(166, 22);
+            this.toolStripMenuItem18.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem18.Text = "Sperren";
             this.toolStripMenuItem18.Click += new System.EventHandler(this.toolStripMenuItem18_Click);
             // 
             // toolStripMenuItem19
             // 
             this.toolStripMenuItem19.Name = "toolStripMenuItem19";
-            this.toolStripMenuItem19.Size = new System.Drawing.Size(166, 22);
+            this.toolStripMenuItem19.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem19.Text = "Band";
             this.toolStripMenuItem19.Click += new System.EventHandler(this.toolStripMenuItem19_Click);
             // 
             // toolStripMenuItem20
             // 
             this.toolStripMenuItem20.Name = "toolStripMenuItem20";
-            this.toolStripMenuItem20.Size = new System.Drawing.Size(166, 22);
+            this.toolStripMenuItem20.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem20.Text = "Druckfarbe";
             this.toolStripMenuItem20.Click += new System.EventHandler(this.toolStripMenuItem20_Click);
             // 
@@ -340,7 +339,7 @@ namespace Querdruck
             // 
             this.toolStripMenuItem21.Name = "toolStripMenuItem21";
             this.toolStripMenuItem21.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-            this.toolStripMenuItem21.Size = new System.Drawing.Size(166, 22);
+            this.toolStripMenuItem21.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem21.Text = "Ausdruck";
             // 
             // toolStripMenuItem4
@@ -351,8 +350,7 @@ namespace Querdruck
             this.toolStripMenuItem24,
             this.referenzfahrtToolStripMenuItem,
             this.schriftplattWechselnToolStripMenuItem,
-            this.dauersuchenToolStripMenuItem,
-            this.teildruckToolStripMenuItem});
+            this.dauersuchenToolStripMenuItem});
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
             this.toolStripMenuItem4.Size = new System.Drawing.Size(57, 20);
             this.toolStripMenuItem4.Text = "Fenster";
@@ -371,6 +369,7 @@ namespace Querdruck
             this.automSuchenToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2;
             this.automSuchenToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.automSuchenToolStripMenuItem.Text = "Autom. Suchen";
+            this.automSuchenToolStripMenuItem.Click += new System.EventHandler(this.automSuchenToolStripMenuItem_Click);
             // 
             // toolStripMenuItem24
             // 
@@ -816,7 +815,6 @@ namespace Querdruck
             this.WeißButton.Name = "WeißButton";
             this.WeißButton.Size = new System.Drawing.Size(53, 17);
             this.WeißButton.TabIndex = 3;
-            this.WeißButton.TabStop = true;
             this.WeißButton.Text = "silber";
             this.WeißButton.UseVisualStyleBackColor = true;
             // 
@@ -827,7 +825,6 @@ namespace Querdruck
             this.SchwarzButton.Name = "SchwarzButton";
             this.SchwarzButton.Size = new System.Drawing.Size(66, 17);
             this.SchwarzButton.TabIndex = 2;
-            this.SchwarzButton.TabStop = true;
             this.SchwarzButton.Text = "schwarz";
             this.SchwarzButton.UseVisualStyleBackColor = true;
             // 
@@ -838,13 +835,13 @@ namespace Querdruck
             this.GoldButton.Name = "GoldButton";
             this.GoldButton.Size = new System.Drawing.Size(49, 17);
             this.GoldButton.TabIndex = 1;
-            this.GoldButton.TabStop = true;
             this.GoldButton.Text = "gold";
             this.GoldButton.UseVisualStyleBackColor = true;
             // 
             // AlleButton
             // 
             this.AlleButton.AutoSize = true;
+            this.AlleButton.Checked = true;
             this.AlleButton.Location = new System.Drawing.Point(0, 3);
             this.AlleButton.Name = "AlleButton";
             this.AlleButton.Size = new System.Drawing.Size(43, 17);
@@ -1921,14 +1918,6 @@ namespace Querdruck
             this.panel8.Size = new System.Drawing.Size(165, 83);
             this.panel8.TabIndex = 117;
             // 
-            // teildruckToolStripMenuItem
-            // 
-            this.teildruckToolStripMenuItem.Name = "teildruckToolStripMenuItem";
-            this.teildruckToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F11;
-            this.teildruckToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
-            this.teildruckToolStripMenuItem.Text = "Teildruck";
-            this.teildruckToolStripMenuItem.Click += new System.EventHandler(this.teildruckToolStripMenuItem_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2120,7 +2109,6 @@ namespace Querdruck
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel panel8;
-        private System.Windows.Forms.ToolStripMenuItem teildruckToolStripMenuItem;
     }
 }
 
