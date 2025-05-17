@@ -2637,7 +2637,7 @@ namespace Querdruck
                         {
                             Stmp = !Stempel_prüfen();
                         }
-                        Trennung();
+                        //Trennung();
                         M4 = 0;
                         AnzahlVonABSt = 0;
                     }
@@ -2646,7 +2646,7 @@ namespace Querdruck
                         MessageBox.Show(ex.ToString());
                     }
                 }
-                Motore_5_Drehen_Relativ("20");
+                //Motore_5_Drehen_Relativ("20");
                 if (Satz_Nr.Text != "") { DruckÄndern_Neu("Druckdatei", Zeile); }
                 this.BeginInvoke(new MethodInvoker(() =>
                 {
@@ -2731,7 +2731,7 @@ namespace Querdruck
             {
                 Stmp = !Stempel_prüfen();
             }
-            Trennung();
+            //Trennung();
             string sdr = Tisch_Pos_bringen(v.ToString());
             Motoren_1A_2A_3R_4A_5R(höhe, Sonder.ToString(), "0", M5, sdr);
             Motoren_stehen();
@@ -2742,7 +2742,7 @@ namespace Querdruck
             {
                 Stmp = !Stempel_prüfen();
             }
-            Trennung();
+            //Trennung();
         }
 
         // Tisch Position aus Datenbank aufrunfen
@@ -2838,7 +2838,7 @@ namespace Querdruck
             if (AlleButton.Checked) Add_Farbe = "";
             AktuellDatei = "druckdatei";
             SchriftGröße.SelectedIndex = Int32.Parse(Platte.Text) - 4;
-            DruckAufrufen("(select max(nr) from druckdatei where Ged Like \"%Q" +
+            DruckAufrufen("(select max(nr) from druckdatei where Ged Like \"%Q%" +
                 (SchriftGröße.SelectedIndex + 1).ToString() + "%\"" + Add_Farbe + ")");
             AktuellDruck = Satz_Nr.Text;
         }
@@ -4743,6 +4743,7 @@ namespace Querdruck
             try { FarbeEingabe.SelectedIndex = Int32.Parse(frb) - 1; } catch { FarbeEingabe.SelectedIndex = -1; }
             if (string.IsNullOrEmpty(gedd)) return;
             BackGroundFarben(gedd);
+            Seite2Erkennen();
         }
 
         private void toolStripMenuItem10_Click(object sender, EventArgs e)
@@ -4802,6 +4803,7 @@ namespace Querdruck
             try { Breite.SelectedIndex = Int32.Parse(brte); } catch { Breite.SelectedIndex = -1; }
             try { AbstandVonAussen.Value = Int32.Parse(AVA); } catch { AbstandVonAussen.Value = 100; }
             try { FarbeEingabe.SelectedIndex = Int32.Parse(frb) - 1; } catch { FarbeEingabe.SelectedIndex = -1; }
+            Seite2Erkennen();
         }
 
         private void toolStripMenuItem5_Click(object sender, EventArgs e)

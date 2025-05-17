@@ -19,6 +19,7 @@ namespace Querdruck
         {
             InitializeComponent();
             this.Datei = Datei;
+            this.Text= Datei;
         }
         private void DruckSuchen_Load(object sender, EventArgs e)
         {
