@@ -1483,7 +1483,7 @@ namespace Querdruck
         private void Sperren1_KeyPress(object sender, KeyPressEventArgs e)
         {
             {
-                if (!char.IsNumber(e.KeyChar) && !char.IsControl(e.KeyChar))
+                if (!(char.IsNumber(e.KeyChar) || e.KeyChar == '-') && !char.IsControl(e.KeyChar))
                 {
                     e.Handled = true;
                 }
@@ -1493,7 +1493,7 @@ namespace Querdruck
         private void Sperren2_KeyPress(object sender, KeyPressEventArgs e)
         {
             {
-                if (!char.IsNumber(e.KeyChar) && !char.IsControl(e.KeyChar))
+                if (!(char.IsNumber(e.KeyChar) || e.KeyChar == '-') && !char.IsControl(e.KeyChar))
                 {
                     e.Handled = true;
                 }
@@ -1503,7 +1503,7 @@ namespace Querdruck
         private void Sperren3_KeyPress(object sender, KeyPressEventArgs e)
         {
             {
-                if (!char.IsNumber(e.KeyChar) && !char.IsControl(e.KeyChar))
+                if (!(char.IsNumber(e.KeyChar) || e.KeyChar == '-') && !char.IsControl(e.KeyChar))
                 {
                     e.Handled = true;
                 }
@@ -1513,7 +1513,7 @@ namespace Querdruck
         private void Sperren4_KeyPress(object sender, KeyPressEventArgs e)
         {
             {
-                if (!char.IsNumber(e.KeyChar) && !char.IsControl(e.KeyChar))
+                if (!(char.IsNumber(e.KeyChar) || e.KeyChar == '-') && !char.IsControl(e.KeyChar))
                 {
                     e.Handled = true;
                 }
@@ -1523,7 +1523,7 @@ namespace Querdruck
         private void Sperren5_KeyPress(object sender, KeyPressEventArgs e)
         {
             {
-                if (!char.IsNumber(e.KeyChar) && !char.IsControl(e.KeyChar))
+                if (!(char.IsNumber(e.KeyChar) || e.KeyChar == '-') && !char.IsControl(e.KeyChar))
                 {
                     e.Handled = true;
                 }
@@ -1533,7 +1533,7 @@ namespace Querdruck
         private void Sperren6_KeyPress(object sender, KeyPressEventArgs e)
         {
             {
-                if (!char.IsNumber(e.KeyChar) && !char.IsControl(e.KeyChar))
+                if (!(char.IsNumber(e.KeyChar) || e.KeyChar == '-') && !char.IsControl(e.KeyChar))
                 {
                     e.Handled = true;
                 }
@@ -1543,7 +1543,7 @@ namespace Querdruck
         private void Sperren7_KeyPress(object sender, KeyPressEventArgs e)
         {
             {
-                if (!char.IsNumber(e.KeyChar) && !char.IsControl(e.KeyChar))
+                if (!(char.IsNumber(e.KeyChar) || e.KeyChar == '-') && !char.IsControl(e.KeyChar))
                 {
                     e.Handled = true;
                 }
@@ -1553,7 +1553,7 @@ namespace Querdruck
         private void Sperren8_KeyPress(object sender, KeyPressEventArgs e)
         {
             {
-                if (!char.IsNumber(e.KeyChar) && !char.IsControl(e.KeyChar))
+                if (!(char.IsNumber(e.KeyChar) || e.KeyChar == '-') && !char.IsControl(e.KeyChar))
                 {
                     e.Handled = true;
                 }
@@ -1563,7 +1563,7 @@ namespace Querdruck
         private void Sperren9_KeyPress(object sender, KeyPressEventArgs e)
         {
             {
-                if (!char.IsNumber(e.KeyChar) && !char.IsControl(e.KeyChar))
+                if (!(char.IsNumber(e.KeyChar) || e.KeyChar == '-') && !char.IsControl(e.KeyChar))
                 {
                     e.Handled = true;
                 }
@@ -1573,7 +1573,7 @@ namespace Querdruck
         private void Sperren10_KeyPress(object sender, KeyPressEventArgs e)
         {
             {
-                if (!char.IsNumber(e.KeyChar) && !char.IsControl(e.KeyChar))
+                if (!(char.IsNumber(e.KeyChar) || e.KeyChar == '-') && !char.IsControl(e.KeyChar))
                 {
                     e.Handled = true;
                 }
@@ -1583,7 +1583,7 @@ namespace Querdruck
         private void Sperren11_KeyPress(object sender, KeyPressEventArgs e)
         {
             {
-                if (!char.IsNumber(e.KeyChar) && !char.IsControl(e.KeyChar))
+                if (!(char.IsNumber(e.KeyChar) || e.KeyChar == '-') && !char.IsControl(e.KeyChar))
                 {
                     e.Handled = true;
                 }
@@ -1593,7 +1593,7 @@ namespace Querdruck
         private void Sperren12_KeyPress(object sender, KeyPressEventArgs e)
         {
             {
-                if (!char.IsNumber(e.KeyChar) && !char.IsControl(e.KeyChar))
+                if (!(char.IsNumber(e.KeyChar) || e.KeyChar == '-') && !char.IsControl(e.KeyChar))
                 {
                     e.Handled = true;
                 }
@@ -1603,7 +1603,7 @@ namespace Querdruck
         private void Sperren13_KeyPress(object sender, KeyPressEventArgs e)
         {
             {
-                if (!char.IsNumber(e.KeyChar) && !char.IsControl(e.KeyChar))
+                if (!(char.IsNumber(e.KeyChar) || e.KeyChar == '-') && !char.IsControl(e.KeyChar))
                 {
                     e.Handled = true;
                 }
@@ -1613,7 +1613,7 @@ namespace Querdruck
         private void Sperren14_KeyPress(object sender, KeyPressEventArgs e)
         {
             {
-                if (!char.IsNumber(e.KeyChar) && !char.IsControl(e.KeyChar))
+                if (!(char.IsNumber(e.KeyChar) || e.KeyChar == '-') && !char.IsControl(e.KeyChar))
                 {
                     e.Handled = true;
                 }
@@ -1623,7 +1623,7 @@ namespace Querdruck
         private void Sperren15_KeyPress(object sender, KeyPressEventArgs e)
         {
             {
-                if (!char.IsNumber(e.KeyChar) && !char.IsControl(e.KeyChar))
+                if (!(char.IsNumber(e.KeyChar) || e.KeyChar == '-') && !char.IsControl(e.KeyChar))
                 {
                     e.Handled = true;
                 }
@@ -2571,6 +2571,8 @@ namespace Querdruck
                             }
                             else if (Abstände.Contains(Zum_Drucken[x - 1]))
                             {
+                                //M4 += Zeichen_Breite(Zum_Drucken[x - 1]) * 4;
+                                //AnzahlVonABSt += 1;
                                 continue;
                             }
                             int höhe = (Int32.Parse(Zeilen_Höhe[Zeile].Text) - 32) * 40;
@@ -3593,6 +3595,7 @@ namespace Querdruck
             else if (Zeile == Zeile13) { ActualSperren = Sperren13; }
             else if (Zeile == Zeile14) { ActualSperren = Sperren14; }
             else { ActualSperren = Sperren15; }
+            if (ActualSperren.Text.EndsWith("-")) return;
             bool nichtleersperren = (!string.IsNullOrEmpty(ActualSperren.Text));
             string connStr = "server=localhost;user=root;database=movedb;port=3306;password=6540";
             MySqlConnection conn = new MySqlConnection(connStr);
